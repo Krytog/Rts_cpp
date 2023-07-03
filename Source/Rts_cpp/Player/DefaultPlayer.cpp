@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/EngineTypes.h"
+#include <cmath>
 
 #define CAMERA_LAG_SPEED 2.0f
 
@@ -17,7 +18,7 @@ ADefaultPlayer::ADefaultPlayer()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	RootComponent = SpringArm;
 
-	SpringArm->TargetArmLength = CameraDistance;
+	SpringArm->TargetArmLength = StartCameraDistance;
 	SpringArm->bEnableCameraLag = true;
 	SpringArm->CameraLagSpeed = CAMERA_LAG_SPEED;
 	SpringArm->bEnableCameraRotationLag = false;
@@ -39,7 +40,7 @@ void ADefaultPlayer::BeginPlay()
 void ADefaultPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	OnMouseMove();
 }
 
 // Called to bind functionality to input
@@ -49,3 +50,35 @@ void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ADefaultPlayer::OnMouseMove()
+{
+	FVector2D MousePosition;
+	bool bOverGameWindow = GetWorld()->GetGameViewport()->GetMousePosition(MousePosition);
+	if (!bOverGameWindow) {
+		return;
+	}
+	FVector2D ViewportSize;
+	GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+	const float RelativeMouseX = MousePosition.X / ViewportSize.X;
+	const float RelativeMouseY = MousePosition.Y / ViewportSize.Y;
+	const float CameraOffsetToAdd = CameraMoveSpeed * GetWorld()->DeltaTimeSeconds;
+	if (RelativeMouseX < CameraMoveOffset) 
+	{
+		AddActorWorldOffset(FVector(0.0f, -CameraOffsetToAdd, 0.0f));
+	}
+	else if (RelativeMouseX > 1.0f - CameraMoveOffset) {
+		AddActorWorldOffset(FVector(0.0f, CameraOffsetToAdd, 0.0f));
+	}
+	if (RelativeMouseY < CameraMoveOffset)
+	{
+		AddActorWorldOffset(FVector(CameraOffsetToAdd, 0.0f, 0.0f));
+	}
+	else if (RelativeMouseY > 1.0f - CameraMoveOffset) {
+		AddActorWorldOffset(FVector(-CameraOffsetToAdd, 0.0f, 0.0f));
+	}
+}
+
+void ADefaultPlayer::OnMouseScroll(float value)
+{
+	
+}

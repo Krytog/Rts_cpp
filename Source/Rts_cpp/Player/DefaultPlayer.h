@@ -33,5 +33,22 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
 
-	float CameraDistance = 500.0f;
+	void OnMouseMove();
+	void OnMouseScroll(float value);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
+	float StartCameraDistance = 250.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
+	float MinCameraDistance = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
+	float MaxCameraDistance = 1000.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
+	float CameraMoveOffset = 0.05f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
+	float CameraMoveSpeed = 500.0f;
 };
