@@ -18,7 +18,7 @@ ADefaultPlayer::ADefaultPlayer()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	RootComponent = SpringArm;
 
-	SpringArm->TargetArmLength = StartCameraDistance;
+	SpringArm->TargetArmLength = CameraArmDistance;
 	SpringArm->bEnableCameraLag = true;
 	SpringArm->CameraLagSpeed = CAMERA_LAG_SPEED;
 	SpringArm->bEnableCameraRotationLag = false;
@@ -27,6 +27,8 @@ ADefaultPlayer::ADefaultPlayer()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetIncludingScale, USpringArmComponent::SocketName);
+
+	SpeedScaleCoefficient = CameraMoveSpeed / CameraArmDistance;
 }
 
 // Called when the game starts or when spawned
@@ -47,13 +49,13 @@ void ADefaultPlayer::Tick(float DeltaTime)
 void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	PlayerInputComponent->BindAxis("Wheel", this, &ADefaultPlayer::OnMouseScroll);
 }
 
 void ADefaultPlayer::OnMouseMove()
 {
 	FVector2D MousePosition;
-	bool bOverGameWindow = GetWorld()->GetGameViewport()->GetMousePosition(MousePosition);
+	const bool bOverGameWindow = GetWorld()->GetGameViewport()->GetMousePosition(MousePosition);
 	if (!bOverGameWindow) {
 		return;
 	}
@@ -61,7 +63,7 @@ void ADefaultPlayer::OnMouseMove()
 	GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
 	const float RelativeMouseX = MousePosition.X / ViewportSize.X;
 	const float RelativeMouseY = MousePosition.Y / ViewportSize.Y;
-	const float CameraOffsetToAdd = CameraMoveSpeed * GetWorld()->DeltaTimeSeconds;
+	const float CameraOffsetToAdd = GetScaledMoveSpeed() * GetWorld()->DeltaTimeSeconds;
 	if (RelativeMouseX < CameraMoveOffset) 
 	{
 		AddActorWorldOffset(FVector(0.0f, -CameraOffsetToAdd, 0.0f));
@@ -78,7 +80,23 @@ void ADefaultPlayer::OnMouseMove()
 	}
 }
 
-void ADefaultPlayer::OnMouseScroll(float value)
+void ADefaultPlayer::OnMouseScroll(float Value)
 {
-	
+	if (!Value)
+	{
+		return;
+	}
+	Value *= -1; // Multiply it by -1 because we want to zoom in on scrolling up, in that case Value would be 1, but height must be decreased
+	const float Height = GetActorLocation().Z;
+	const bool bZoomIn = (Value < 0 && Height > MinCameraHeight);
+	const bool bZoomOut = (Value > 0 && Height < MaxCameraHeight);
+	if (bZoomIn || bZoomOut)
+	{
+		AddActorWorldOffset(FVector(0.0f, 0.0f, Value * CameraMoveSpeed));
+	}
+}
+
+float ADefaultPlayer::GetScaledMoveSpeed() const
+{
+	return SpeedScaleCoefficient * std::max(GetActorLocation().Z, static_cast<double>(CameraArmDistance));
 }

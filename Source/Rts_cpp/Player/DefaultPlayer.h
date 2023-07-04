@@ -27,28 +27,31 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
 
 	void OnMouseMove();
-	void OnMouseScroll(float value);
+	void OnMouseScroll(float Value);
+	
+	float GetScaledMoveSpeed() const;
+	float SpeedScaleCoefficient;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
-	float StartCameraDistance = 250.0f;
+	float CameraArmDistance = 150.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
-	float MinCameraDistance = 100.0f;
+	float MinCameraHeight = 0.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
-	float MaxCameraDistance = 1000.0f;
+	float MaxCameraHeight = 2500.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
 	float CameraMoveOffset = 0.05f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
-	float CameraMoveSpeed = 500.0f;
+	float CameraMoveSpeed = 250.0f;
 };
