@@ -13,5 +13,7 @@ UCLASS()
 class RTS_CPP_API ADefaultPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
+public:
+	ADefaultPlayerController();
 };

@@ -33,11 +33,26 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
 
+
+	// Mouse handling section
+
 	void OnMouseMove();
 	void OnMouseScroll(float Value);
 	
 	float GetScaledMoveSpeed() const;
 	float SpeedScaleCoefficient;
+
+	// Objects selection section
+
+	void InitHUDPointer();
+	void OnSelectionBegin();
+	void OnSelectionFinished();
+
+	UPROPERTY()
+	class ADefaultPlayerHUD* HUD;
+
+	UPROPERTY()
+	TArray<class ISelectable*> SelectedObjects;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
@@ -54,4 +69,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
 	float CameraMoveSpeed = 250.0f;
+
+public:
+	void UpdateSelectedObjects(const TArray<class ISelectable*>& NewSelectedObjects);
 };

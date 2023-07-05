@@ -6,6 +6,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/EngineTypes.h"
 #include <cmath>
+#include "Player/DefaultPlayerHUD.h"
+#include "Interfaces/Selectable.h"
 
 #define CAMERA_LAG_SPEED 2.0f
 
@@ -35,7 +37,7 @@ ADefaultPlayer::ADefaultPlayer()
 void ADefaultPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	InitHUDPointer();
 }
 
 // Called every frame
@@ -50,6 +52,8 @@ void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("Wheel", this, &ADefaultPlayer::OnMouseScroll);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &ADefaultPlayer::OnSelectionBegin);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &ADefaultPlayer::OnSelectionFinished);
 }
 
 void ADefaultPlayer::OnMouseMove()
@@ -99,4 +103,31 @@ void ADefaultPlayer::OnMouseScroll(float Value)
 float ADefaultPlayer::GetScaledMoveSpeed() const
 {
 	return SpeedScaleCoefficient * std::max(GetActorLocation().Z, static_cast<double>(CameraArmDistance));
+}
+
+void ADefaultPlayer::InitHUDPointer()
+{
+	APlayerController* MyController = Cast<APlayerController>(GetController());
+	HUD = Cast<ADefaultPlayerHUD>(MyController->GetHUD());
+}
+
+void ADefaultPlayer::OnSelectionBegin()
+{
+	if (HUD)
+	{
+		HUD->SelectionBegin();
+	}
+}
+
+void ADefaultPlayer::OnSelectionFinished()
+{
+	if (HUD)
+	{
+		HUD->SelectionFinished();
+	}
+}
+
+void ADefaultPlayer::UpdateSelectedObjects(const TArray<ISelectable*>& NewSelectedObjects)
+{
+	SelectedObjects = NewSelectedObjects;
 }

@@ -3,3 +3,7 @@
 
 #include "DefaultPlayerController.h"
 
+ADefaultPlayerController::ADefaultPlayerController()
+{
+	bShowMouseCursor = true;
+}
