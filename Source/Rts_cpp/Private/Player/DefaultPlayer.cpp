@@ -127,7 +127,15 @@ void ADefaultPlayer::OnSelectionFinished()
 	}
 }
 
-void ADefaultPlayer::UpdateSelectedObjects(const TArray<ISelectable*>& NewSelectedObjects)
+void ADefaultPlayer::UpdateSelectedObjects(TArray<ISelectable*>& NewSelectedObjects)
 {
-	SelectedObjects = NewSelectedObjects;
+	for (auto* const Object : SelectedObjects)
+	{
+		Object->OnDeselect();
+	}
+	SelectedObjects = MoveTemp(NewSelectedObjects);
+	for (auto* const Object : SelectedObjects)
+	{
+		Object->OnSelect();
+	}
 }

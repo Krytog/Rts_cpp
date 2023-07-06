@@ -71,5 +71,5 @@ protected:
 	float CameraMoveSpeed = 250.0f;
 
 public:
-	void UpdateSelectedObjects(const TArray<class ISelectable*>& NewSelectedObjects);
+	void UpdateSelectedObjects(TArray<class ISelectable*>& NewSelectedObjects);
 };

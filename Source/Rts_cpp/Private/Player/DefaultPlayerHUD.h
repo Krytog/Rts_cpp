@@ -19,6 +19,8 @@ public:
 	void SelectionUpdate();
 	void SelectionFinished();
 
+	void Tick(float DeltaTime) override;
+
 	void DrawHUD() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SelectionRectColor")
@@ -26,5 +28,6 @@ public:
 
 private:
 	FVector2D StartPosition;
+	FVector2D CurrentPosition;
 	bool bSelecting = false;
 };

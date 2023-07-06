@@ -24,4 +24,5 @@ class RTS_CPP_API ISelectable
 public:
 	virtual void OnSelect() = 0;
 	virtual void OnDeselect() = 0;
+	virtual bool IsSelected() const = 0;
 };
