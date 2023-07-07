@@ -48,11 +48,15 @@ private:
 	void OnSelectionBegin();
 	void OnSelectionFinished();
 
+	void OnSelectionMergeBegin();
+	void OnSelectionMergeFinished();
+	bool bMerging = false;
+
 	UPROPERTY()
 	class ADefaultPlayerHUD* HUD;
 
 	UPROPERTY()
-	TArray<class ISelectable*> SelectedObjects;
+	TSet<AActor*> SelectedObjects;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
@@ -71,5 +75,5 @@ protected:
 	float CameraMoveSpeed = 250.0f;
 
 public:
-	void UpdateSelectedObjects(TArray<class ISelectable*>& NewSelectedObjects);
+	void UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects);
 };

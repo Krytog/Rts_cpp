@@ -16,8 +16,8 @@ class ADefaultPlayerHUD : public AHUD
 
 public:
 	void SelectionBegin();
-	void SelectionUpdate();
 	void SelectionFinished();
+	void SelectionUpdate();
 
 	void Tick(float DeltaTime) override;
 

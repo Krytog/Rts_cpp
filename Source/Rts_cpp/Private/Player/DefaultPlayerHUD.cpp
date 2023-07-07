@@ -2,7 +2,6 @@
 
 
 #include "Player/DefaultPlayerHUD.h"
-#include "Interfaces/Selectable.h"
 #include "Player/DefaultPlayer.h"
 #include "EngineUtils.h"
 
@@ -18,16 +17,8 @@ void ADefaultPlayerHUD::SelectionUpdate()
 	GetOwningPlayerController()->GetMousePosition(CurrentPosition.X, CurrentPosition.Y);
 	TArray<AActor*> AllObjectsInRect;
 	GetActorsInSelectionRectangle(StartPosition, CurrentPosition, AllObjectsInRect, false, false);
-	TArray<ISelectable*> SelectableObjects;
-	for (auto* const Object : AllObjectsInRect)
-	{
-		if (ISelectable* Selectable = Cast<ISelectable>(Object))
-		{
-			SelectableObjects.Add(Selectable);
-		}
-	}
 	ADefaultPlayer* Player = Cast<ADefaultPlayer>(GetOwningPawn());
-	Player->UpdateSelectedObjects(SelectableObjects);
+	Player->UpdateSelectedObjects(AllObjectsInRect);
 }
 
 void ADefaultPlayerHUD::SelectionFinished()
@@ -47,6 +38,7 @@ void ADefaultPlayerHUD::DrawHUD()
 
 void ADefaultPlayerHUD::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 	if (bSelecting) {
 		GetOwningPlayerController()->GetMousePosition(CurrentPosition.X, CurrentPosition.Y);
 	}

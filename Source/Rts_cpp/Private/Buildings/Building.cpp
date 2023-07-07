@@ -23,12 +23,14 @@ void ABuilding::OnSelect()
 {
 	bSelected = true;
 	SelectionDecalComponent->SetVisibility(true);
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Emerald, FString::Printf(TEXT("SELECTED!")));
 }
 
 void ABuilding::OnDeselect()
 {
 	bSelected = false;
 	SelectionDecalComponent->SetVisibility(false);
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("DESELECTED!")));
 }
 
 // Called when the game starts or when spawned

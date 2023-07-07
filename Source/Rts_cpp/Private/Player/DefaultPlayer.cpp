@@ -54,6 +54,8 @@ void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("Wheel", this, &ADefaultPlayer::OnMouseScroll);
 	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &ADefaultPlayer::OnSelectionBegin);
 	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &ADefaultPlayer::OnSelectionFinished);
+	PlayerInputComponent->BindAction("LeftShift", IE_Pressed, this, &ADefaultPlayer::OnSelectionMergeBegin);
+	PlayerInputComponent->BindAction("LeftShift", IE_Released, this, &ADefaultPlayer::OnSelectionMergeFinished);
 }
 
 void ADefaultPlayer::OnMouseMove()
@@ -127,15 +129,53 @@ void ADefaultPlayer::OnSelectionFinished()
 	}
 }
 
-void ADefaultPlayer::UpdateSelectedObjects(TArray<ISelectable*>& NewSelectedObjects)
+void ADefaultPlayer::OnSelectionMergeBegin()
 {
-	for (auto* const Object : SelectedObjects)
+	bMerging = true;
+}
+
+void ADefaultPlayer::OnSelectionMergeFinished()
+{
+	bMerging = false;
+}
+
+void ADefaultPlayer::UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects)
+{
+	if (!bMerging)
 	{
-		Object->OnDeselect();
+		TSet<AActor*> AlreadyInSet;
+		for (auto* const Object : NewSelectedObjects)
+		{
+			if (SelectedObjects.Contains(Object))
+			{
+				AlreadyInSet.Add(Object);
+			}
+		}
+		for (auto* const Object : SelectedObjects)
+		{
+			if (!AlreadyInSet.Contains(Object))
+			{
+				if (ISelectable* Selectable = Cast<ISelectable>(Object))
+				{
+					Selectable->OnDeselect();
+				}
+				SelectedObjects.Remove(Object);
+			}
+		}
 	}
-	SelectedObjects = MoveTemp(NewSelectedObjects);
-	for (auto* const Object : SelectedObjects)
+	for (auto* const Object : NewSelectedObjects)
 	{
-		Object->OnSelect();
+		if (SelectedObjects.Contains(Object))
+		{
+			continue;
+		}
+		if (ISelectable* Selectable = Cast<ISelectable>(Object))
+		{
+			if (!Selectable->IsSelected())
+			{
+				SelectedObjects.Add(Object);
+				Selectable->OnSelect();
+			}
+		}
 	}
 }
