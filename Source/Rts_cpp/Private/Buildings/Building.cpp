@@ -37,21 +37,7 @@ void ABuilding::OnDeselect()
 void ABuilding::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ABuilding::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	if (Mesh)
-	{
-		MeshComponent->SetStaticMesh(Mesh);
-	}
-	if (DecalMaterial)
-	{
-		SelectionDecal->SetMaterial(0, DecalMaterial);
-	}
-	SelectionDecalComponent->SetStaticMesh(SelectionDecal);
-	SelectionDecalComponent->SetVisibility(bSelected);
+	SelectionDecalComponent->SetVisibility(false);
 }
 
 // Called every frame

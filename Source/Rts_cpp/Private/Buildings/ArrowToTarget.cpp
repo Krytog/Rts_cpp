@@ -34,15 +34,6 @@ void AArrowToTarget::InitLength()
 	PointerLength = 2 * PointerMeshComponent->Bounds.BoxExtent.X;
 }
 
-void AArrowToTarget::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	BodyMeshComponent->SetStaticMesh(BodyMesh);
-	PointerMeshComponent->SetStaticMesh(PointerMesh);
-	BodyMeshComponent->SetMaterial(0, Material);
-	PointerMeshComponent->SetMaterial(0, Material);
-}
-
 void AArrowToTarget::MakePointingTo(const FVector& From, const FVector& To)
 {
 	SetActorRotation(FRotator());

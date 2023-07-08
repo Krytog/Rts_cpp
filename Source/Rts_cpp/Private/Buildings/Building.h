@@ -16,8 +16,6 @@ public:
 	// Sets default values for this actor's properties
 	ABuilding();
 
-	virtual void OnConstruction(const FTransform& Transform) override;
-
 	virtual void OnSelect() override;
 	virtual void OnDeselect() override;
 
@@ -32,20 +30,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BasicBuildingSettings|Mesh")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BasicBuildingSettings|Mesh")
 	class UStaticMeshComponent* MeshComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BasicBuildingSettings|Mesh")
-	class UStaticMesh* Mesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BasicBuildingSettings|SelectionDecal")
 	class UStaticMeshComponent* SelectionDecalComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BasicBuildingSettings|SelectionDecal")
-	class UStaticMesh* SelectionDecal;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BasicBuildingSettings|SelectionDecal")
-	class UMaterialInterface* DecalMaterial;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BasicBuildingSettings|SelectionDecal")
 	bool bSelected = false;

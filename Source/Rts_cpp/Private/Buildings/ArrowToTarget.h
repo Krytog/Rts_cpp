@@ -15,8 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	AArrowToTarget();
 
-	virtual void OnConstruction(const FTransform& Transform) override;
-
 	void SetVisibility(bool bNewVisibility);
 
 protected:
@@ -26,17 +24,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArrowSettings|Body")
 	class UStaticMeshComponent* BodyMeshComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ArrowSettings|Body")
-	class UStaticMesh* BodyMesh;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ArrowSettings|Pointer")
 	class UStaticMeshComponent* PointerMeshComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ArrowSettings|Pointer")
-	class UStaticMesh* PointerMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ArrowSettings|Material")
-	class UMaterialInterface* Material;
 
 private:
 	float BodyLength = 1.0f;
