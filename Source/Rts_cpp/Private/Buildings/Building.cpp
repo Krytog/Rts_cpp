@@ -42,8 +42,14 @@ void ABuilding::BeginPlay()
 void ABuilding::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	MeshComponent->SetStaticMesh(Mesh);
-	SelectionDecal->SetMaterial(0, DecalMaterial);
+	if (Mesh)
+	{
+		MeshComponent->SetStaticMesh(Mesh);
+	}
+	if (DecalMaterial)
+	{
+		SelectionDecal->SetMaterial(0, DecalMaterial);
+	}
 	SelectionDecalComponent->SetStaticMesh(SelectionDecal);
 	SelectionDecalComponent->SetVisibility(bSelected);
 }
