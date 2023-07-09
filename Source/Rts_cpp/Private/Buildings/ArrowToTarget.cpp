@@ -32,6 +32,7 @@ void AArrowToTarget::InitLength()
 {
 	BodyLength = 2 * BodyMeshComponent->Bounds.BoxExtent.X;
 	PointerLength = 2 * PointerMeshComponent->Bounds.BoxExtent.X;
+	PointerOffset = PointerMeshComponent->GetRelativeLocation().X / BodyMeshComponent->GetComponentScale().X;
 }
 
 void AArrowToTarget::MakePointingTo(const FVector& From, const FVector& To)
@@ -41,10 +42,12 @@ void AArrowToTarget::MakePointingTo(const FVector& From, const FVector& To)
 	const FVector Direction = To - From;
 	const float Distance = Direction.Length();
 	const float ScaleFactor = (Distance - PointerLength) / BodyLength;
-	BodyMeshComponent->SetWorldScale3D(FVector(ScaleFactor, 1.0f, 1.0f));
-	PointerMeshComponent->SetRelativeLocation(FVector(ScaleFactor * BodyLength / 2, 0.0f, 0.0f));
+	FVector Scale = BodyMeshComponent->GetComponentScale();
+	Scale.X *= ScaleFactor;
+	BodyMeshComponent->SetRelativeScale3D(Scale);
+	PointerMeshComponent->SetRelativeLocation(FVector(ScaleFactor * BodyLength / 2 + PointerLength / 2, 0.0f, 0.0f));
 	SetActorRotation(Direction.Rotation());
-	const FVector ArrowPosition = (From * ScaleFactor * BodyLength / 2 + To * (ScaleFactor * BodyLength / 2 + PointerLength)) / Distance;
+	const FVector ArrowPosition = (To * ScaleFactor * BodyLength / 2 + From * (ScaleFactor * BodyLength / 2 + PointerLength)) / Distance;
 	SetActorLocation(ArrowPosition);
 }
 

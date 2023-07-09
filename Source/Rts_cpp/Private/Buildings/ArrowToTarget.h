@@ -30,6 +30,7 @@ protected:
 private:
 	float BodyLength = 1.0f;
 	float PointerLength = 1.0f;
+	float PointerOffset = 0.0f;
 
 	void InitLength();
 
