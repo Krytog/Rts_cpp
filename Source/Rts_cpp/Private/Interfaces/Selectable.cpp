@@ -10,7 +10,7 @@ ISelectable::FDestroyedEvent& ISelectable::OnDestroyed()
 	return DestroyedEvent;
 }
 
-void ISelectable::OnDestroyedBroadcast()
+void ISelectable::NotifyThatDestroyed()
 {
 	DestroyedEvent.Broadcast(Cast<AActor>(this));
 }

@@ -44,21 +44,21 @@ void ADefaultPlayer::BeginPlay()
 void ADefaultPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	OnMouseMove();
+	MoveCamera();
 }
 
 // Called to bind functionality to input
 void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("Wheel", this, &ADefaultPlayer::OnMouseScroll);
-	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &ADefaultPlayer::OnSelectionBegin);
-	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &ADefaultPlayer::OnSelectionFinished);
-	PlayerInputComponent->BindAction("LeftShift", IE_Pressed, this, &ADefaultPlayer::OnSelectionMergeBegin);
-	PlayerInputComponent->BindAction("LeftShift", IE_Released, this, &ADefaultPlayer::OnSelectionMergeFinished);
+	PlayerInputComponent->BindAxis("Wheel", this, &ADefaultPlayer::ScrollCamera);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &ADefaultPlayer::SelectionBegin);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &ADefaultPlayer::SelectionFinished);
+	PlayerInputComponent->BindAction("LeftShift", IE_Pressed, this, &ADefaultPlayer::SelectionMergeBegin);
+	PlayerInputComponent->BindAction("LeftShift", IE_Released, this, &ADefaultPlayer::SelectionMergeFinished);
 }
 
-void ADefaultPlayer::OnMouseMove()
+void ADefaultPlayer::MoveCamera()
 {
 	FVector2D MousePosition;
 	const bool bOverGameWindow = GetWorld()->GetGameViewport()->GetMousePosition(MousePosition);
@@ -86,7 +86,7 @@ void ADefaultPlayer::OnMouseMove()
 	}
 }
 
-void ADefaultPlayer::OnMouseScroll(float Value)
+void ADefaultPlayer::ScrollCamera(float Value)
 {
 	if (!Value)
 	{
@@ -113,7 +113,7 @@ void ADefaultPlayer::InitHUDPointer()
 	HUD = Cast<ADefaultPlayerHUD>(MyController->GetHUD());
 }
 
-void ADefaultPlayer::OnSelectionBegin()
+void ADefaultPlayer::SelectionBegin()
 {
 	if (HUD)
 	{
@@ -121,7 +121,7 @@ void ADefaultPlayer::OnSelectionBegin()
 	}
 }
 
-void ADefaultPlayer::OnSelectionFinished()
+void ADefaultPlayer::SelectionFinished()
 {
 	if (HUD)
 	{
@@ -129,12 +129,12 @@ void ADefaultPlayer::OnSelectionFinished()
 	}
 }
 
-void ADefaultPlayer::OnSelectionMergeBegin()
+void ADefaultPlayer::SelectionMergeBegin()
 {
 	bMerging = true;
 }
 
-void ADefaultPlayer::OnSelectionMergeFinished()
+void ADefaultPlayer::SelectionMergeFinished()
 {
 	bMerging = false;
 }
@@ -148,7 +148,7 @@ void ADefaultPlayer::AddObjectToSelected(AActor* Object)
 	}
 	if (!Selectable->IsSelected())
 	{
-		Selectable->OnSelect();
+		Selectable->Select();
 	}
 	FDelegateHandle DelegateHandle = Selectable->OnDestroyed().AddUObject(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
 	SelectedObjects.Add(Object);
@@ -167,7 +167,7 @@ void ADefaultPlayer::RemoveObjectFromSelected(AActor* Object)
 	SelectedObjectsDelegateHandlers.RemoveAndCopyValue(Object, DelegateHandle);
 	if (Selectable->IsSelected())
 	{
-		Selectable->OnDeselect();
+		Selectable->Deselect();
 	}
 	Selectable->OnDestroyed().Remove(DelegateHandle);
 }

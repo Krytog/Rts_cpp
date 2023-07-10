@@ -16,8 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	ABuilding();
 
-	virtual void OnSelect() override;
-	virtual void OnDeselect() override;
+	virtual void Select() override;
+	virtual void Deselect() override;
 
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	bool IsSelected() const override;

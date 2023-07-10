@@ -19,14 +19,14 @@ ABuilding::ABuilding()
 	SelectionDecalComponent->bUseAttachParentBound = true;
 }
 
-void ABuilding::OnSelect()
+void ABuilding::Select()
 {
 	bSelected = true;
 	SelectionDecalComponent->SetVisibility(true);
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Emerald, FString::Printf(TEXT("SELECTED!")));
 }
 
-void ABuilding::OnDeselect()
+void ABuilding::Deselect()
 {
 	bSelected = false;
 	SelectionDecalComponent->SetVisibility(false);
@@ -49,7 +49,7 @@ void ABuilding::Tick(float DeltaTime)
 void ABuilding::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	OnDestroyedBroadcast();
+	NotifyThatDestroyed();
 }
 
 bool ABuilding::IsSelected() const

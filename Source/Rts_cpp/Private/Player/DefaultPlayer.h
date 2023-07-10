@@ -36,8 +36,8 @@ private:
 
 	// Mouse handling section
 
-	void OnMouseMove();
-	void OnMouseScroll(float Value);
+	void MoveCamera();
+	void ScrollCamera(float Value);
 	
 	float GetScaledMoveSpeed() const;
 	float SpeedScaleCoefficient;
@@ -45,11 +45,11 @@ private:
 	// Objects selection section
 
 	void InitHUDPointer();
-	void OnSelectionBegin();
-	void OnSelectionFinished();
+	void SelectionBegin();
+	void SelectionFinished();
 
-	void OnSelectionMergeBegin();
-	void OnSelectionMergeFinished();
+	void SelectionMergeBegin();
+	void SelectionMergeFinished();
 	bool bMerging = false;
 
 	UPROPERTY()
