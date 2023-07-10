@@ -46,6 +46,12 @@ void ABuilding::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ABuilding::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	OnDestroyedBroadcast();
+}
+
 bool ABuilding::IsSelected() const
 {
 	return bSelected;

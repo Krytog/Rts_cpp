@@ -58,6 +58,11 @@ private:
 	UPROPERTY()
 	TSet<AActor*> SelectedObjects;
 
+	TMap<AActor*, FDelegateHandle> SelectedObjectsDelegateHandlers;
+
+	void AddObjectToSelected(AActor* Object);
+	void RemoveObjectFromSelected(AActor* Object);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
 	float CameraArmDistance = 150.0f;
@@ -76,4 +81,5 @@ protected:
 
 public:
 	void UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects);
+	void RemoveFromSelectedWhenDestroyed(const AActor* Object);
 };

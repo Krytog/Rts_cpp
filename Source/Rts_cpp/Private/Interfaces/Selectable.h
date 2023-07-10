@@ -25,4 +25,13 @@ public:
 	virtual void OnSelect() = 0;
 	virtual void OnDeselect() = 0;
 	virtual bool IsSelected() const = 0;
+
+	DECLARE_EVENT_OneParam(ISelectable, FDestroyedEvent, const AActor*);
+	FDestroyedEvent& OnDestroyed();
+
+protected:
+	void OnDestroyedBroadcast();
+
+private:
+	FDestroyedEvent DestroyedEvent;
 };

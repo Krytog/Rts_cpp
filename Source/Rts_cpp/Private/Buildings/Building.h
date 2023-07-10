@@ -19,6 +19,7 @@ public:
 	virtual void OnSelect() override;
 	virtual void OnDeselect() override;
 
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	bool IsSelected() const override;
 
 protected:

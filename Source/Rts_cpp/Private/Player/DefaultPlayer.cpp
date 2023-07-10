@@ -139,6 +139,45 @@ void ADefaultPlayer::OnSelectionMergeFinished()
 	bMerging = false;
 }
 
+void ADefaultPlayer::AddObjectToSelected(AActor* Object)
+{
+	ISelectable* Selectable = Cast<ISelectable>(Object);
+	if (!Selectable)
+	{
+		return;
+	}
+	if (!Selectable->IsSelected())
+	{
+		Selectable->OnSelect();
+	}
+	FDelegateHandle DelegateHandle = Selectable->OnDestroyed().AddUObject(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
+	SelectedObjects.Add(Object);
+	SelectedObjectsDelegateHandlers.Add(Object, DelegateHandle);
+}
+
+void ADefaultPlayer::RemoveObjectFromSelected(AActor* Object)
+{
+	ISelectable* Selectable = Cast<ISelectable>(Object);
+	if (!Selectable)
+	{
+		return;
+	}
+	FDelegateHandle DelegateHandle;
+	SelectedObjects.Remove(Object);
+	SelectedObjectsDelegateHandlers.RemoveAndCopyValue(Object, DelegateHandle);
+	if (Selectable->IsSelected())
+	{
+		Selectable->OnDeselect();
+	}
+	Selectable->OnDestroyed().Remove(DelegateHandle);
+}
+
+void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(const AActor* Object)
+{
+	SelectedObjects.Remove(Object);
+	SelectedObjectsDelegateHandlers.Remove(Object);
+}
+
 void ADefaultPlayer::UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects)
 {
 	if (!bMerging)
@@ -155,11 +194,7 @@ void ADefaultPlayer::UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObj
 		{
 			if (!AlreadyInSet.Contains(Object))
 			{
-				if (ISelectable* Selectable = Cast<ISelectable>(Object))
-				{
-					Selectable->OnDeselect();
-				}
-				SelectedObjects.Remove(Object);
+				RemoveObjectFromSelected(Object);
 			}
 		}
 	}
@@ -169,13 +204,6 @@ void ADefaultPlayer::UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObj
 		{
 			continue;
 		}
-		if (ISelectable* Selectable = Cast<ISelectable>(Object))
-		{
-			if (!Selectable->IsSelected())
-			{
-				SelectedObjects.Add(Object);
-				Selectable->OnSelect();
-			}
-		}
+		AddObjectToSelected(Object);
 	}
 }
