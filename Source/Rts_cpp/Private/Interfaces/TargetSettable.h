@@ -24,6 +24,7 @@ class ITargetSettable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void SetTargetLocation(const FVector& Location) = 0;
+	virtual void SetTarget(AActor* Target) = 0;
 	virtual TOptional<FVector> GetTargetLocation() const = 0;
-	virtual void ResetTargetLocation() = 0;
+	virtual void ResetTarget() = 0;
 };

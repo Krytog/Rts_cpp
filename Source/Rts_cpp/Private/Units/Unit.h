@@ -4,16 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/Selectable.h"
 #include "Unit.generated.h"
 
 UCLASS()
-class AUnit : public AActor
+class AUnit : public AActor, public ISelectable
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	AUnit();
+
+	virtual void Select() {};
+	virtual void Deselect() {};
+	virtual bool IsSelected() const { return false; };
 
 protected:
 	// Called when the game starts or when spawned

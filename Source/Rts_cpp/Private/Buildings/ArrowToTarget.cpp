@@ -35,6 +35,7 @@ void AArrowToTarget::InitLength()
 	PointerOffset = PointerMeshComponent->GetRelativeLocation().X / BodyMeshComponent->GetComponentScale().X;
 }
 
+#pragma optimize("", off) // Works strange without the pragma
 void AArrowToTarget::MakePointingTo(const FVector& From, const FVector& To)
 {
 	SetActorRotation(FRotator());
@@ -50,6 +51,7 @@ void AArrowToTarget::MakePointingTo(const FVector& From, const FVector& To)
 	const FVector ArrowPosition = (To * ScaleFactor * BodyLength / 2 + From * (ScaleFactor * BodyLength / 2 + PointerLength)) / Distance;
 	SetActorLocation(ArrowPosition);
 }
+#pragma optimize("", on)
 
 void AArrowToTarget::SetVisibility(bool bNewVisibility)
 {

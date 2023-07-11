@@ -8,6 +8,8 @@
 #include <cmath>
 #include "Player/DefaultPlayerHUD.h"
 #include "Interfaces/Selectable.h"
+#include "Interfaces/TargetSettable.h"
+#include "Math/UnrealMathUtility.h"
 
 #define CAMERA_LAG_SPEED 2.0f
 
@@ -56,6 +58,7 @@ void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &ADefaultPlayer::SelectionFinished);
 	PlayerInputComponent->BindAction("LeftShift", IE_Pressed, this, &ADefaultPlayer::SelectionMergeBegin);
 	PlayerInputComponent->BindAction("LeftShift", IE_Released, this, &ADefaultPlayer::SelectionMergeFinished);
+	PlayerInputComponent->BindAction("RightMouse", IE_Pressed, this, &ADefaultPlayer::GiveTagetToSelected);
 }
 
 void ADefaultPlayer::MoveCamera()
@@ -206,4 +209,49 @@ void ADefaultPlayer::UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObj
 		}
 		AddObjectToSelected(Object);
 	}
+}
+
+void ADefaultPlayer::GiveTagetToSelected()
+{
+	if (!SelectedObjects.Num())
+	{
+		return;
+	}
+	APlayerController* MyController = Cast<APlayerController>(GetController());
+	FHitResult HitResult;
+	MyController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
+	AActor* Target = HitResult.GetActor();
+	if (Cast<ISelectable>(Target))
+	{
+		for (auto* const Object : SelectedObjects)
+		{
+			if (ITargetSettable* TargetSettable = Cast<ITargetSettable>(Object))
+			{
+				TargetSettable->SetTarget(Target);
+			}
+		}
+	}
+	else
+	{
+		const FVector Location = GetLocationUnderCursor();
+		for (auto* const Object : SelectedObjects)
+		{
+			if (ITargetSettable* TargetSettable = Cast<ITargetSettable>(Object))
+			{
+				TargetSettable->SetTargetLocation(Location);
+			}
+		}
+	}
+}
+
+FVector ADefaultPlayer::GetLocationUnderCursor() const
+{
+	FVector EndPoint;
+	FVector WorldDirection;
+	APlayerController* MyController = Cast<APlayerController>(GetController());
+	MyController->DeprojectMousePositionToWorld(EndPoint, WorldDirection);
+	FVector BeginPoint = Camera->GetComponentLocation();
+	FVector Origin = { 0.0f, 0.0f, 0.0f, };
+	FVector Normal = FVector::ZAxisVector;
+	return FMath::LinePlaneIntersection(BeginPoint, EndPoint, Origin, Normal);
 }

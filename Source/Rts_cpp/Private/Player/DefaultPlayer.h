@@ -63,6 +63,10 @@ private:
 	void AddObjectToSelected(AActor* Object);
 	void RemoveObjectFromSelected(AActor* Object);
 
+	void GiveTagetToSelected();
+
+	FVector GetLocationUnderCursor() const;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
 	float CameraArmDistance = 150.0f;

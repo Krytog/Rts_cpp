@@ -4,17 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ArrowToTagetComponent.generated.h"
+#include "ArrowToTargetComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UArrowToTagetComponent : public UActorComponent
+class UArrowToTargetComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UArrowToTagetComponent();
+	UArrowToTargetComponent();
+
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
@@ -23,20 +25,23 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UFUNCTION(BlueprintCallable)
 	void SetTargetLocation(const FVector& Location);
+	void SetTarget(AActor* Target);
 
-	TOptional<FVector> GetTargetLocation();
+	TOptional<FVector> GetTargetLocation() const;
+	AActor* GetTargetActor() const;
 
-	UFUNCTION(BlueprintCallable)
-	void ResetTargetLocation();
+	bool IsTargetSet() const;
+	void ResetTarget();
 
-	UFUNCTION(BlueprintCallable)
 	void SetArrowVisibility(bool bNewVisibility);
 
 private:
 	FVector TargetLocation;
-	bool bTargetLocationSet = false;
+	bool bTargetSet = false;
+
+	UPROPERTY()
+	AActor* TargetActor = nullptr;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="ArrowClass")
