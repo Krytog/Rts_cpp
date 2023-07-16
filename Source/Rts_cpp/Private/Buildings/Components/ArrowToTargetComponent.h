@@ -34,6 +34,8 @@ public:
 	bool IsTargetSet() const;
 	void ResetTarget();
 
+	void SetTargetLocationWhenTargetDestroyed(const AActor* Target);
+
 	void SetArrowVisibility(bool bNewVisibility);
 
 private:
@@ -42,6 +44,10 @@ private:
 
 	UPROPERTY()
 	AActor* TargetActor = nullptr;
+
+	FDelegateHandle DestroyDelegateHadler;
+
+	void ClearTargetActor();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="ArrowClass")

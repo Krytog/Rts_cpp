@@ -11,6 +11,25 @@ AUnit::AUnit()
 
 }
 
+void AUnit::Select()
+{
+}
+
+void AUnit::Deselect()
+{
+}
+
+bool AUnit::IsSelected() const
+{
+	return false;
+}
+
+void AUnit::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	NotifyThatDestroyed();
+}
+
 // Called when the game starts or when spawned
 void AUnit::BeginPlay()
 {

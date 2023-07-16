@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Buildings/Components/ArrowToTargetComponent.h"
+#include "Interfaces/Selectable.h"
 #include "Buildings/ArrowToTarget.h"
 
 // Sets default values for this component's properties
@@ -44,8 +45,7 @@ void UArrowToTargetComponent::SetTargetLocation(const FVector& Location)
 	TargetLocation = Location;
 	bTargetSet = true;
 	ArrowActor->MakePointingTo(GetOwner()->GetActorLocation(), Location);
-	TargetActor = nullptr;
-	SetComponentTickEnabled(false);
+	ClearTargetActor();
 }
 
 void UArrowToTargetComponent::SetTarget(AActor* Target)
@@ -53,6 +53,10 @@ void UArrowToTargetComponent::SetTarget(AActor* Target)
 	TargetActor = Target;
 	bTargetSet = true;
 	SetComponentTickEnabled(true);
+	if (ISelectable* Selectable = Cast<ISelectable>(Target))
+	{
+		DestroyDelegateHadler = Selectable->OnDestroyed().AddUObject(this, &UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed);
+	}
 }
 
 TOptional<FVector> UArrowToTargetComponent::GetTargetLocation() const
@@ -71,9 +75,14 @@ AActor* UArrowToTargetComponent::GetTargetActor() const
 
 void UArrowToTargetComponent::ResetTarget()
 {
+	ClearTargetActor();
 	bTargetSet = false;
-	TargetActor = nullptr;
 	ArrowActor->SetVisibility(false);
+}
+
+void UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed(const AActor* Target)
+{
+	TargetActor = nullptr;
 	SetComponentTickEnabled(false);
 }
 
@@ -82,10 +91,18 @@ void UArrowToTargetComponent::SetArrowVisibility(bool bNewVisibility)
 	ArrowActor->SetVisibility(bNewVisibility);
 }
 
+void UArrowToTargetComponent::ClearTargetActor()
+{
+	if (ISelectable* Selectable = Cast<ISelectable>(TargetActor))
+	{
+		Selectable->OnDestroyed().Remove(DestroyDelegateHadler);
+	}
+	TargetActor = nullptr;
+	SetComponentTickEnabled(false);
+}
+
 bool UArrowToTargetComponent::IsTargetSet() const
 {
 	return bTargetSet;
 }
-
-
 

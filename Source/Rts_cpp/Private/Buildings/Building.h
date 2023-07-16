@@ -21,6 +21,8 @@ public:
 
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	bool IsSelected() const override;
+	
+	virtual float GetLogistickRadius() const;
 
 protected:
 	// Called when the game starts or when spawned

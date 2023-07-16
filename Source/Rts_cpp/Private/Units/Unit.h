@@ -16,9 +16,11 @@ public:
 	// Sets default values for this actor's properties
 	AUnit();
 
-	virtual void Select() {};
-	virtual void Deselect() {};
-	virtual bool IsSelected() const { return false; };
+	virtual void Select() override;
+	virtual void Deselect() override;
+	virtual bool IsSelected() const override;
+
+	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 protected:
 	// Called when the game starts or when spawned
