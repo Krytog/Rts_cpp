@@ -15,7 +15,6 @@ UArrowToTargetComponent::UArrowToTargetComponent()
 
 void UArrowToTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Emerald, FString::Printf(TEXT("TICKED!")));
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (!TargetActor)
 	{

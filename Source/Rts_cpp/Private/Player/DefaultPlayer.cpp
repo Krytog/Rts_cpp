@@ -10,6 +10,7 @@
 #include "Interfaces/Selectable.h"
 #include "Interfaces/TargetSettable.h"
 #include "Math/UnrealMathUtility.h"
+#include "Player/Components/BuildingNetworkComponent.h"
 
 #define CAMERA_LAG_SPEED 2.0f
 
@@ -33,6 +34,8 @@ ADefaultPlayer::ADefaultPlayer()
 	Camera->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetIncludingScale, USpringArmComponent::SocketName);
 
 	SpeedScaleCoefficient = CameraMoveSpeed / CameraArmDistance;
+
+	BuildingNetwork = CreateDefaultSubobject<UBuildingNetworkComponent>(TEXT("BuildingNetwork"));
 }
 
 // Called when the game starts or when spawned

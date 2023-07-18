@@ -66,6 +66,10 @@ private:
 	void GiveTagetToSelected();
 
 	FVector GetLocationUnderCursor() const;
+public:
+	// Buildings Network section
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Buildings Network", meta = (AllowPrivateAccess = "true"))
+	class UBuildingNetworkComponent* BuildingNetwork;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")

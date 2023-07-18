@@ -52,6 +52,14 @@ void FGraphWithPointers::RemoveConnection(const AActor* First, const AActor* Sec
 
 void FGraphWithPointers::RemoveVertex(const AActor* Vertex)
 {
+	if (!Graph.Contains(Vertex))
+	{
+		return;
+	}
+	for (auto& [GraphVertex, Set] : Graph)
+	{
+		Set.Remove(Vertex);
+	}
 	Graph.Remove(Vertex);
 	ComponentNum.Remove(Vertex);
 	bComponentNumsValid = false;
@@ -124,7 +132,7 @@ void FGraphWithPointers::DFS(const AActor* From)
 	ComponentNum[From] = TotalComponents;
 	for (auto Neighbour : Graph[From])
 	{
-		if (ComponentNum[Neighbour])
+		if (!ComponentNum[Neighbour])
 		{
 			DFS(Neighbour);
 		}

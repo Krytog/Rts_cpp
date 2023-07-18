@@ -29,28 +29,69 @@ void UBuildingNetworkComponent::BeginPlay()
 void UBuildingNetworkComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	DrawDebugGraphConnections();
 }
 
-void UBuildingNetworkComponent::AddBuilding(ABuilding* Building)
+void UBuildingNetworkComponent::AddBuilding(AActor* Building)
 {
+	ABuilding* BuildingCasted = Cast<ABuilding>(Building);
+	if (!BuildingCasted)
+	{
+		return;
+	}
+	BuildingCasted->ISelectable::OnDestroyed().AddUObject(this, &UBuildingNetworkComponent::RemoveBuilding);
+	Buildings.Add(BuildingCasted);
 	Graph.AddVertexToGraph(Building);
+	CalculateConnections(BuildingCasted);
 	Graph.CalculateComponents();
-	Building->ISelectable::OnDestroyed().AddUObject(this, RemoveBuilding);
 }
 
 void UBuildingNetworkComponent::RemoveBuilding(const AActor* Building)
 {
 	Graph.RemoveVertex(Building);
+	Buildings.RemoveSingleSwap(Cast<ABuilding>(const_cast<AActor*>(Building))); // It's a bad practice
 	Graph.CalculateComponents();
 }
 
-bool UBuildingNetworkComponent::IsConnected(const ABuilding* First, const ABuilding* Second) const
+int32 UBuildingNetworkComponent::GetComponentOf(const AActor* Building) const
+{
+	return Graph.GetComponentOf(Building);
+}
+
+void UBuildingNetworkComponent::DrawDebugGraphConnections() const
+{
+	for (const AActor* const Building : Buildings)
+	{
+		for (const AActor* const OtherBuilding : Buildings)
+		{
+			if (Building == OtherBuilding)
+			{
+				continue;
+			}
+			if (Graph.IsConnected(Building, OtherBuilding))
+			{
+				DrawDebugLine(GetWorld(), Building->GetActorLocation(), OtherBuilding->GetActorLocation(), FColor::Emerald);
+			}
+		}
+	}
+}
+
+bool UBuildingNetworkComponent::IsToBeConnected(const ABuilding* First, const ABuilding* Second) const
 {
 	float FirstRadius = First->GetLogistickRadius();
 	float SecondRadius = Second->GetLogistickRadius();
 	float Distance = FVector::Distance(First->GetActorLocation(), Second->GetActorLocation());
 	return Distance <= FirstRadius || Distance <= SecondRadius;
+}
+
+void UBuildingNetworkComponent::CalculateConnections(const ABuilding* Building)
+{
+	for (const ABuilding* const OtherBuilding : Buildings)
+	{
+		if (IsToBeConnected(Building, OtherBuilding))
+		{
+			Graph.ConnectVertices(Building, OtherBuilding);
+		}
+	}
 }
 

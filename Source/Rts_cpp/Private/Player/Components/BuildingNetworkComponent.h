@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "GraphWithPointers.h"
+
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "BuildingNetworkComponent.generated.h"
@@ -24,12 +26,20 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	void AddBuilding(ABuilding* Building);
+	
+	void AddBuilding(AActor* Building);
 	void RemoveBuilding(const AActor* Building);
 
+	int32 GetComponentOf(const AActor* Building) const;
+
+	void DrawDebugGraphConnections() const;
+
 private:
-	bool IsConnected(const ABuilding* First, const ABuilding* Second) const;
+	bool IsToBeConnected(const ABuilding* First, const ABuilding* Second) const;
+	void CalculateConnections(const ABuilding* Building);
 
 	class FGraphWithPointers Graph;
+
+	UPROPERTY()
+	TArray<ABuilding*> Buildings;
 };

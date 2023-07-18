@@ -59,6 +59,6 @@ bool ABuilding::IsSelected() const
 
 float ABuilding::GetLogistickRadius() const
 {
-	return 0.0f;
+	return 500.0f;
 }
 
