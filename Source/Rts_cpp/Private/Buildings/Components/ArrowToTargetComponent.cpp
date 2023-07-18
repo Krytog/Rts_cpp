@@ -49,6 +49,10 @@ void UArrowToTargetComponent::SetTargetLocation(const FVector& Location)
 
 void UArrowToTargetComponent::SetTarget(AActor* Target)
 {
+	if (Target == GetOwner())
+	{
+		return;
+	}
 	TargetActor = Target;
 	bTargetSet = true;
 	SetComponentTickEnabled(true);

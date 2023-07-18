@@ -70,7 +70,7 @@ void UBuildingNetworkComponent::DrawDebugGraphConnections() const
 			}
 			if (Graph.IsConnected(Building, OtherBuilding))
 			{
-				DrawDebugLine(GetWorld(), Building->GetActorLocation(), OtherBuilding->GetActorLocation(), FColor::Emerald);
+				DrawDebugLine(GetWorld(), Building->GetActorLocation(), OtherBuilding->GetActorLocation(), FColor::Red);
 			}
 		}
 	}

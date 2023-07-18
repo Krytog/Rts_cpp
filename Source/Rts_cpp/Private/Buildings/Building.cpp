@@ -23,14 +23,12 @@ void ABuilding::Select()
 {
 	bSelected = true;
 	SelectionDecalComponent->SetVisibility(true);
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Emerald, FString::Printf(TEXT("SELECTED!")));
 }
 
 void ABuilding::Deselect()
 {
 	bSelected = false;
 	SelectionDecalComponent->SetVisibility(false);
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("DESELECTED!")));
 }
 
 // Called when the game starts or when spawned
@@ -59,6 +57,6 @@ bool ABuilding::IsSelected() const
 
 float ABuilding::GetLogistickRadius() const
 {
-	return 500.0f;
+	return 0.0f;
 }
 
