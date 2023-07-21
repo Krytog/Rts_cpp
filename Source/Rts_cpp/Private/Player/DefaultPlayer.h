@@ -66,9 +66,9 @@ private:
 	void GiveTagetToSelected();
 
 	FVector GetLocationUnderCursor() const;
-public:
+
 	// Buildings Network section
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Buildings Network", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY()
 	class UBuildingNetworkComponent* BuildingNetwork;
 
 protected:
@@ -90,4 +90,6 @@ protected:
 public:
 	void UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects);
 	void RemoveFromSelectedWhenDestroyed(const AActor* Object);
+
+	class UBuildingNetworkComponent* GetBuildingNetwork();
 };

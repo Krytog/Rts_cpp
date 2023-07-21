@@ -3,6 +3,9 @@
 
 #include "Building.h"
 #include "Components/StaticMeshComponent.h"
+#include "Player/DefaultPlayer.h"
+#include "Buildings/Components/BuildingNetworkAgentComponent.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 ABuilding::ABuilding()
@@ -16,7 +19,14 @@ ABuilding::ABuilding()
 	SelectionDecalComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionMesh"));
 	SelectionDecalComponent->AttachToComponent(MeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	SelectionDecalComponent->SetVisibility(false);
+	SelectionDecalComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SelectionDecalComponent->bUseAttachParentBound = true;
+
+	BuildingNetworkAgentComponent = CreateDefaultSubobject<UBuildingNetworkAgentComponent>(TEXT("BuildingNetworkAgent"));
+
+	InfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InfoWidget"));
+	InfoWidgetComponent->AttachToComponent(MeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	InfoWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABuilding::Select()
@@ -58,5 +68,11 @@ bool ABuilding::IsSelected() const
 float ABuilding::GetLogistickRadius() const
 {
 	return 0.0f;
+}
+
+void ABuilding::BindToPlayer(ADefaultPlayer* Player) const
+{
+	UBuildingNetworkComponent* BuildingNetwork = Player->GetBuildingNetwork();
+	BuildingNetworkAgentComponent->InsertInNetwork(BuildingNetwork);
 }
 

@@ -24,6 +24,9 @@ public:
 	
 	virtual float GetLogistickRadius() const;
 
+	UFUNCTION(BlueprintCallable)
+	void BindToPlayer(class ADefaultPlayer* Player) const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,4 +44,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BasicBuildingSettings|SelectionDecal")
 	bool bSelected = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BuildingSettings|BuildingNetworkAgent")
+	class UBuildingNetworkAgentComponent* BuildingNetworkAgentComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingSettings|BuildingInfoWidget")
+	class UWidgetComponent* InfoWidgetComponent;
 };

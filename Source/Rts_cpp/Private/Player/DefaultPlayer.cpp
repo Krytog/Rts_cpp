@@ -184,6 +184,11 @@ void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(const AActor* Object)
 	SelectedObjectsDelegateHandlers.Remove(Object);
 }
 
+UBuildingNetworkComponent* ADefaultPlayer::GetBuildingNetwork()
+{
+	return BuildingNetwork;
+}
+
 void ADefaultPlayer::UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects)
 {
 	if (!bMerging)

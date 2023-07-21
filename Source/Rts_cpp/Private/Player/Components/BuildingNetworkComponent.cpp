@@ -68,9 +68,10 @@ void UBuildingNetworkComponent::DrawDebugGraphConnections() const
 			{
 				continue;
 			}
-			if (Graph.IsConnected(Building, OtherBuilding))
+			if (Graph.IsConnectedDirected(Building, OtherBuilding))
 			{
-				DrawDebugLine(GetWorld(), Building->GetActorLocation(), OtherBuilding->GetActorLocation(), FColor::Red);
+				const FVector Offset = 0.15f * (Building->GetActorLocation() - OtherBuilding->GetActorLocation());
+				DrawDebugDirectionalArrow(GetWorld(), Building->GetActorLocation(), OtherBuilding->GetActorLocation() + Offset, 500.0f, FColor::Emerald);
 			}
 		}
 	}
@@ -78,9 +79,9 @@ void UBuildingNetworkComponent::DrawDebugGraphConnections() const
 
 bool UBuildingNetworkComponent::IsToBeConnected(const ABuilding* First, const ABuilding* Second) const
 {
-	float FirstRadius = First->GetLogistickRadius();
-	float SecondRadius = Second->GetLogistickRadius();
-	float Distance = FVector::Distance(First->GetActorLocation(), Second->GetActorLocation());
+	const float FirstRadius = First->GetLogistickRadius();
+	const float SecondRadius = Second->GetLogistickRadius();
+	const float Distance = FVector::Distance(First->GetActorLocation(), Second->GetActorLocation());
 	return Distance <= FirstRadius || Distance <= SecondRadius;
 }
 
