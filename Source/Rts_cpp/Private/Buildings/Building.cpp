@@ -41,6 +41,11 @@ void ABuilding::Deselect()
 	SelectionDecalComponent->SetVisibility(false);
 }
 
+EPlacementMode ABuilding::GetCurrentPlacementMode() const
+{
+	return CurrentPlacementMode;
+}
+
 // Called when the game starts or when spawned
 void ABuilding::BeginPlay()
 {
@@ -76,3 +81,76 @@ void ABuilding::BindToPlayer(ADefaultPlayer* Player) const
 	BuildingNetworkAgentComponent->InsertInNetwork(BuildingNetwork);
 }
 
+FText ABuilding::GetInfoName() const
+{
+	return InfoName;
+}
+
+void ABuilding::SetPlacementMode(EPlacementMode Mode, bool bForced)
+{
+	if (!bForced && Mode == EPlacementMode::None)
+	{
+		return;
+	}
+	if (!bForced && CurrentPlacementMode == EPlacementMode::AlreadyPlaced)
+	{
+		return;
+	}
+	ABuilding* CDO = Cast<ABuilding>(GetClass()->GetDefaultObject());
+	if (!CDO)
+	{
+		return;
+	}
+	const auto& InitialMaterials = CDO->MeshComponent->GetMaterials();
+	const int32 MaterialsNum = InitialMaterials.Num();
+	switch (Mode)
+	{
+		case EPlacementMode::CanBePlaced:
+		{
+			for (int32 i = 0; i < MaterialsNum; ++i)
+			{
+				MeshComponent->SetMaterial(i, MaterialPlacementGood);
+			}
+			CurrentPlacementMode = EPlacementMode::CanBePlaced;
+			break;
+		}
+		case EPlacementMode::CannotBePlaced:
+		{
+			for (int32 i = 0; i < MaterialsNum; ++i)
+			{
+				MeshComponent->SetMaterial(i, MaterialPlacementBad);
+			}
+			CurrentPlacementMode = EPlacementMode::CannotBePlaced;
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+void ABuilding::Place()
+{
+	if (CurrentPlacementMode == EPlacementMode::AlreadyPlaced)
+	{
+		return;
+	}
+	if (CurrentPlacementMode == EPlacementMode::CannotBePlaced)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CANNOT BE PLACED HERE!!!"));
+		return;
+	}
+	ABuilding* CDO = Cast<ABuilding>(GetClass()->GetDefaultObject());
+	if (!CDO)
+	{
+		return;
+	}
+	const auto& InitialMaterials = CDO->MeshComponent->GetMaterials();
+	const int32 MaterialsNum = InitialMaterials.Num();
+	for (int32 i = 0; i < MaterialsNum; ++i)
+	{
+		MeshComponent->SetMaterial(i, InitialMaterials[i]);
+	}
+	CurrentPlacementMode = EPlacementMode::AlreadyPlaced;
+}

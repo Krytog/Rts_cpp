@@ -22,6 +22,8 @@ public:
 
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual FText GetInfoName() const override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

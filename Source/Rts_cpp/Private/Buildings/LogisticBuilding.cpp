@@ -34,16 +34,21 @@ void ALogisticBuilding::OnConstruction(const FTransform& Transform)
 void ALogisticBuilding::Select()
 {
 	ABuilding::Select();
-	LogisticFieldComponent->SetVisibility(true);
+	SetLogisticFieldVisibility(true);
 }
 
 void ALogisticBuilding::Deselect()
 {
 	ABuilding::Deselect();
-	LogisticFieldComponent->SetVisibility(false);
+	SetLogisticFieldVisibility(false);
 }
 
 float ALogisticBuilding::GetLogistickRadius() const
 {
 	return LogisticFieldRadius;
+}
+
+void ALogisticBuilding::SetLogisticFieldVisibility(bool bNewVisibility)
+{
+	LogisticFieldComponent->SetVisibility(bNewVisibility);
 }

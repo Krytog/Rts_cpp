@@ -34,6 +34,8 @@ public:
 
 	void DrawDebugGraphConnections() const;
 
+	void EnableBuildingPlacementMode(bool bEnabled) const;
+
 private:
 	bool IsToBeConnected(const ABuilding* First, const ABuilding* Second) const;
 	void CalculateConnections(const ABuilding* Building);

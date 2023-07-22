@@ -52,6 +52,9 @@ private:
 	void SelectionMergeFinished();
 	bool bMerging = false;
 
+	// Sometimes various events affect selection visibility of selected objects, this function manually changes their selection visibility
+	void ForceEnableSelectionVisibilityOfSelected(bool bNewVisibility) const;
+
 	UPROPERTY()
 	class ADefaultPlayerHUD* HUD;
 
@@ -65,11 +68,12 @@ private:
 
 	void GiveTagetToSelected();
 
-	FVector GetLocationUnderCursor() const;
-
 	// Buildings Network section
 	UPROPERTY()
 	class UBuildingNetworkComponent* BuildingNetwork;
+
+	UFUNCTION(BlueprintCallable)
+	void EnableBuildingPlacementMode(bool bEnabled) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
@@ -91,5 +95,13 @@ public:
 	void UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects);
 	void RemoveFromSelectedWhenDestroyed(const AActor* Object);
 
+	FVector GetLocationUnderCursor() const;
+
 	class UBuildingNetworkComponent* GetBuildingNetwork();
+
+	UFUNCTION(BlueprintCallable)
+	void EnableDebugBuildingPlacement(bool bEnabled, UClass* BuildingClass);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AActor* TempBuilding = nullptr;
 };

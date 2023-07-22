@@ -50,6 +50,10 @@ void ADefaultPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	MoveCamera();
+	if (TempBuilding)
+	{
+		TempBuilding->SetActorLocation(GetLocationUnderCursor());
+	}
 }
 
 // Called to bind functionality to input
@@ -143,6 +147,30 @@ void ADefaultPlayer::SelectionMergeBegin()
 void ADefaultPlayer::SelectionMergeFinished()
 {
 	bMerging = false;
+}
+
+void ADefaultPlayer::ForceEnableSelectionVisibilityOfSelected(bool bNewVisibility) const
+{
+	if (bNewVisibility)
+	{
+		for (auto* Object : SelectedObjects)
+		{
+			if (ISelectable* Selectable = Cast<ISelectable>(Object))
+			{
+				Selectable->Select();
+			}
+		}
+	}
+	else
+	{
+		for (auto* Object : SelectedObjects)
+		{
+			if (ISelectable* Selectable = Cast<ISelectable>(Object))
+			{
+				Selectable->Deselect();
+			}
+		}
+	}
 }
 
 void ADefaultPlayer::AddObjectToSelected(AActor* Object)
@@ -262,4 +290,24 @@ FVector ADefaultPlayer::GetLocationUnderCursor() const
 	FVector Origin = { 0.0f, 0.0f, 0.0f, };
 	FVector Normal = FVector::ZAxisVector;
 	return FMath::LinePlaneIntersection(BeginPoint, EndPoint, Origin, Normal);
+}
+
+void ADefaultPlayer::EnableBuildingPlacementMode(bool bEnabled) const
+{
+	BuildingNetwork->EnableBuildingPlacementMode(bEnabled);
+	if (!bEnabled)
+	{
+		ForceEnableSelectionVisibilityOfSelected(true);
+	}
+}
+
+void ADefaultPlayer::EnableDebugBuildingPlacement(bool bEnabled, UClass* BuildingClass)
+{
+	if (!bEnabled)
+	{
+		GetWorld()->DestroyActor(TempBuilding);
+		TempBuilding = nullptr;
+		return;
+	}
+	TempBuilding = GetWorld()->SpawnActor<AActor>(BuildingClass);
 }

@@ -44,3 +44,8 @@ void AUnit::Tick(float DeltaTime)
 
 }
 
+FText AUnit::GetInfoName() const
+{
+	return {};
+}
+

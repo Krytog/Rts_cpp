@@ -23,6 +23,7 @@ public:
 	virtual void Deselect() override;
 
 	virtual float GetLogistickRadius() const override;
+	virtual void SetLogisticFieldVisibility(bool bNewVisibility);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Logistic Field")

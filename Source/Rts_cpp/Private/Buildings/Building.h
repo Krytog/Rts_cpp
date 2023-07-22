@@ -7,7 +7,16 @@
 #include "Interfaces/Selectable.h"
 #include "Building.generated.h"
 
-UCLASS()
+UENUM(BlueprintType)
+enum class EPlacementMode : uint8
+{
+	None UMETA(DisplayName = "None"),
+	AlreadyPlaced UMETA(DisplayName = "AlreadyPlaced"),
+	CanBePlaced UMETA(DisplayName = "CanBePlaced"),
+	CannotBePlaced UMETA(DisplayName = "CannotBePlaced")
+};
+
+UCLASS(hidecategories = ("Physics", "Cooking", "Replication", "Rendering", "WorldPartition", "HLOD"))
 class RTS_CPP_API ABuilding : public AActor, public ISelectable
 {
 	GENERATED_BODY()
@@ -26,6 +35,18 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void BindToPlayer(class ADefaultPlayer* Player) const;
+
+	UFUNCTION(BlueprintCallable)
+	virtual FText GetInfoName() const override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetPlacementMode(EPlacementMode Mode, bool bForced = false);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void Place();
+
+	UFUNCTION(BlueprintCallable)
+	EPlacementMode GetCurrentPlacementMode() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -50,4 +71,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingSettings|BuildingInfoWidget")
 	class UWidgetComponent* InfoWidgetComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Name")
+	FText InfoName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BasicBuildingSettings|Placement")
+	class UMaterialInterface* MaterialPlacementGood;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BasicBuildingSettings|Placement")
+	class UMaterialInterface* MaterialPlacementBad;
+
+	EPlacementMode CurrentPlacementMode = EPlacementMode::AlreadyPlaced;
 };

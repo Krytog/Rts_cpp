@@ -3,6 +3,7 @@
 #include "Player/Components/BuildingNetworkComponent.h"
 #include "Player/Components/GraphWithPointers.h"
 #include "Buildings/Building.h"
+#include "Buildings/LogisticBuilding.h"
 
 // Sets default values for this component's properties
 UBuildingNetworkComponent::UBuildingNetworkComponent()
@@ -96,3 +97,13 @@ void UBuildingNetworkComponent::CalculateConnections(const ABuilding* Building)
 	}
 }
 
+void UBuildingNetworkComponent::EnableBuildingPlacementMode(bool bEnabled) const
+{
+	for (ABuilding* const Building : Buildings)
+	{
+		if (ALogisticBuilding* const LogisticBuilding = Cast<ALogisticBuilding>(Building))
+		{
+			LogisticBuilding->SetLogisticFieldVisibility(bEnabled);
+		}
+	}
+}

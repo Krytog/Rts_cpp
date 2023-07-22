@@ -26,6 +26,8 @@ public:
 	virtual void Deselect() = 0;
 	virtual bool IsSelected() const = 0;
 
+	virtual FText GetInfoName() const = 0;
+
 	DECLARE_EVENT_OneParam(ISelectable, FDestroyedEvent, const AActor*);
 	FDestroyedEvent& OnDestroyed();
 
