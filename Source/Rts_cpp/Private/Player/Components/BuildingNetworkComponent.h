@@ -36,6 +36,8 @@ public:
 
 	void EnableBuildingPlacementMode(bool bEnabled) const;
 
+	bool IsInsideLogisticArea(const FVector& ObjectLocation) const;
+
 private:
 	bool IsToBeConnected(const ABuilding* First, const ABuilding* Second) const;
 	void CalculateConnections(const ABuilding* Building);

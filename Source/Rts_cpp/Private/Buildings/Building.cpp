@@ -14,7 +14,8 @@ ABuilding::ABuilding()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BuildingMesh"));
-	RootComponent = MeshComponent;
+	MeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	MeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 
 	SelectionDecalComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionMesh"));
 	SelectionDecalComponent->AttachToComponent(MeshComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -41,16 +42,42 @@ void ABuilding::Deselect()
 	SelectionDecalComponent->SetVisibility(false);
 }
 
-EPlacementMode ABuilding::GetCurrentPlacementMode() const
-{
-	return CurrentPlacementMode;
-}
-
 // Called when the game starts or when spawned
 void ABuilding::BeginPlay()
 {
 	Super::BeginPlay();
 	SelectionDecalComponent->SetVisibility(false);
+
+	MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ABuilding::OverlapBegin);
+	MeshComponent->OnComponentEndOverlap.AddDynamic(this, &ABuilding::OverlapEnd);
+}
+
+void ABuilding::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OverlappedActors)
+	{
+		bool bCouldBePlaced = CanBePlaced();
+		AddPlacementFlag(EPlacementFlags::PositionBlocked);
+		if (bCouldBePlaced && !CanBePlaced())
+		{
+			SetAppropriatePlacementMaterial();
+		}
+	}
+	++OverlappedActors;
+}
+
+void ABuilding::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
+{
+	--OverlappedActors;
+	if (!OverlappedActors)
+	{
+		bool bCouldBePlaced = CanBePlaced();
+		RemovePlacementFlag(EPlacementFlags::PositionBlocked);
+		if (!bCouldBePlaced && CanBePlaced())
+		{
+			SetAppropriatePlacementMaterial();
+		}
+	}
 }
 
 // Called every frame
@@ -86,71 +113,76 @@ FText ABuilding::GetInfoName() const
 	return InfoName;
 }
 
-void ABuilding::SetPlacementMode(EPlacementMode Mode, bool bForced)
+void ABuilding::SetAppropriatePlacementMaterial()
 {
-	if (!bForced && Mode == EPlacementMode::None)
-	{
-		return;
-	}
-	if (!bForced && CurrentPlacementMode == EPlacementMode::AlreadyPlaced)
+	if (HasPlacementFlag(EPlacementFlags::AlreadyPlaced))
 	{
 		return;
 	}
 	ABuilding* CDO = Cast<ABuilding>(GetClass()->GetDefaultObject());
-	if (!CDO)
-	{
-		return;
-	}
+	check(CDO);
 	const auto& InitialMaterials = CDO->MeshComponent->GetMaterials();
 	const int32 MaterialsNum = InitialMaterials.Num();
-	switch (Mode)
+	if (CanBePlaced())
 	{
-		case EPlacementMode::CanBePlaced:
+		for (int32 i = 0; i < MaterialsNum; ++i)
 		{
-			for (int32 i = 0; i < MaterialsNum; ++i)
-			{
-				MeshComponent->SetMaterial(i, MaterialPlacementGood);
-			}
-			CurrentPlacementMode = EPlacementMode::CanBePlaced;
-			break;
+			MeshComponent->SetMaterial(i, MaterialPlacementGood);
 		}
-		case EPlacementMode::CannotBePlaced:
+	}
+	else
+	{
+		for (int32 i = 0; i < MaterialsNum; ++i)
 		{
-			for (int32 i = 0; i < MaterialsNum; ++i)
-			{
-				MeshComponent->SetMaterial(i, MaterialPlacementBad);
-			}
-			CurrentPlacementMode = EPlacementMode::CannotBePlaced;
-			break;
-		}
-		default:
-		{
-			break;
+			MeshComponent->SetMaterial(i, MaterialPlacementBad);
 		}
 	}
 }
 
-void ABuilding::Place()
+bool ABuilding::TryPlace()
 {
-	if (CurrentPlacementMode == EPlacementMode::AlreadyPlaced)
+	if (!CanBePlaced())
 	{
-		return;
-	}
-	if (CurrentPlacementMode == EPlacementMode::CannotBePlaced)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CANNOT BE PLACED HERE!!!"));
-		return;
+		return false;
 	}
 	ABuilding* CDO = Cast<ABuilding>(GetClass()->GetDefaultObject());
-	if (!CDO)
-	{
-		return;
-	}
+	check(CDO);
 	const auto& InitialMaterials = CDO->MeshComponent->GetMaterials();
 	const int32 MaterialsNum = InitialMaterials.Num();
 	for (int32 i = 0; i < MaterialsNum; ++i)
 	{
 		MeshComponent->SetMaterial(i, InitialMaterials[i]);
 	}
-	CurrentPlacementMode = EPlacementMode::AlreadyPlaced;
+	PlacementFlags = uint8(EPlacementFlags::AlreadyPlaced);
+
+	// They're placed and we no longer need to handle their overlappings
+	MeshComponent->OnComponentBeginOverlap.Clear();
+	MeshComponent->OnComponentEndOverlap.Clear();
+
+	return true;
+}
+
+uint8 ABuilding::GetPlacementFlags() const
+{
+	return PlacementFlags;
+}
+
+bool ABuilding::CanBePlaced() const
+{
+	return PlacementFlags == uint8(EPlacementFlags::CanBePlaced);
+}
+
+void ABuilding::AddPlacementFlag(EPlacementFlags Flag)
+{
+	PlacementFlags |= uint8(Flag);
+}
+
+void ABuilding::RemovePlacementFlag(EPlacementFlags Flag)
+{
+	PlacementFlags &= (~uint8(Flag));
+}
+
+bool ABuilding::HasPlacementFlag(EPlacementFlags Flag) const
+{
+	return PlacementFlags & uint8(Flag);
 }

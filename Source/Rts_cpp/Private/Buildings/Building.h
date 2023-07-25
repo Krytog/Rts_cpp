@@ -7,16 +7,17 @@
 #include "Interfaces/Selectable.h"
 #include "Building.generated.h"
 
-UENUM(BlueprintType)
-enum class EPlacementMode : uint8
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor=true))
+enum class EPlacementFlags : uint8
 {
-	None UMETA(DisplayName = "None"),
-	AlreadyPlaced UMETA(DisplayName = "AlreadyPlaced"),
-	CanBePlaced UMETA(DisplayName = "CanBePlaced"),
-	CannotBePlaced UMETA(DisplayName = "CannotBePlaced")
-};
+	CanBePlaced		= 0 UMETA(DisplayName = "CanBePlaced"),
+	AlreadyPlaced	= 1 << 0 UMETA(DisplayName = "AlreadyPlaced"),
+	PositionBlocked	= 1 << 1 UMETA(DisplayName = "CanBePlaced"),
+	NoLogistic		= 1 << 2 UMETA(DisplayName = "CannotBePlaced")
+}; 
+ENUM_CLASS_FLAGS(EPlacementFlags);
 
-UCLASS(hidecategories = ("Physics", "Cooking", "Replication", "Rendering", "WorldPartition", "HLOD"))
+UCLASS(hidecategories = ("Physics", "Cooking", "Replication", "Rendering", "WorldPartition", "HLOD", "Collision", "Events", "DataLayers", "Input"))
 class RTS_CPP_API ABuilding : public AActor, public ISelectable
 {
 	GENERATED_BODY()
@@ -39,14 +40,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual FText GetInfoName() const override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetPlacementMode(EPlacementMode Mode, bool bForced = false);
+	void AddPlacementFlag(EPlacementFlags Flag);
+	void RemovePlacementFlag(EPlacementFlags Flag);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void Place();
+	uint8 GetPlacementFlags() const;
+	bool HasPlacementFlag(EPlacementFlags Flag) const;
+	bool CanBePlaced() const;
 
-	UFUNCTION(BlueprintCallable)
-	EPlacementMode GetCurrentPlacementMode() const;
+	void SetAppropriatePlacementMaterial();
+
+	// Returns whether the building was placed
+	bool TryPlace();
 
 protected:
 	// Called when the game starts or when spawned
@@ -81,5 +85,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BasicBuildingSettings|Placement")
 	class UMaterialInterface* MaterialPlacementBad;
 
-	EPlacementMode CurrentPlacementMode = EPlacementMode::AlreadyPlaced;
+	uint8 PlacementFlags = 0;
+
+private:
+	UFUNCTION()
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
+
+	int32 OverlappedActors = 0;
 };

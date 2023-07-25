@@ -11,6 +11,7 @@
 #include "Interfaces/TargetSettable.h"
 #include "Math/UnrealMathUtility.h"
 #include "Player/Components/BuildingNetworkComponent.h"
+#include "Player/Components/BuildingPlacerComponent.h"
 
 #define CAMERA_LAG_SPEED 2.0f
 
@@ -36,6 +37,7 @@ ADefaultPlayer::ADefaultPlayer()
 	SpeedScaleCoefficient = CameraMoveSpeed / CameraArmDistance;
 
 	BuildingNetwork = CreateDefaultSubobject<UBuildingNetworkComponent>(TEXT("BuildingNetwork"));
+	BuildingPlacer = CreateDefaultSubobject<UBuildingPlacerComponent>(TEXT("BuildingPlacer"));
 }
 
 // Called when the game starts or when spawned
@@ -50,10 +52,6 @@ void ADefaultPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	MoveCamera();
-	if (TempBuilding)
-	{
-		TempBuilding->SetActorLocation(GetLocationUnderCursor());
-	}
 }
 
 // Called to bind functionality to input
@@ -61,11 +59,11 @@ void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("Wheel", this, &ADefaultPlayer::ScrollCamera);
-	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &ADefaultPlayer::SelectionBegin);
+	PlayerInputComponent->BindAction("LeftMouse", IE_Pressed, this, &ADefaultPlayer::LeftMouseClicked);
 	PlayerInputComponent->BindAction("LeftMouse", IE_Released, this, &ADefaultPlayer::SelectionFinished);
 	PlayerInputComponent->BindAction("LeftShift", IE_Pressed, this, &ADefaultPlayer::SelectionMergeBegin);
 	PlayerInputComponent->BindAction("LeftShift", IE_Released, this, &ADefaultPlayer::SelectionMergeFinished);
-	PlayerInputComponent->BindAction("RightMouse", IE_Pressed, this, &ADefaultPlayer::GiveTagetToSelected);
+	PlayerInputComponent->BindAction("RightMouse", IE_Pressed, this, &ADefaultPlayer::RightMouseClicked);
 }
 
 void ADefaultPlayer::MoveCamera()
@@ -117,26 +115,83 @@ float ADefaultPlayer::GetScaledMoveSpeed() const
 	return SpeedScaleCoefficient * std::max(GetActorLocation().Z, static_cast<double>(CameraArmDistance));
 }
 
+void ADefaultPlayer::LeftMouseClicked()
+{
+	switch (CursorMode)
+	{
+		case ECursorMode::None:
+		{
+			SelectionBegin();
+			break;
+		}
+		case ECursorMode::Selecting:
+		{
+			// we can't get here
+			break;
+		}
+		case ECursorMode::PlacingBuilding:
+		{
+			TryPlaceBuilding();
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+void ADefaultPlayer::RightMouseClicked()
+{
+	switch (CursorMode)
+	{
+		case ECursorMode::None:
+		{
+			GiveTagetToSelected();
+			break;
+		}
+		case ECursorMode::Selecting:
+		{
+			// we can't get here
+			break;
+		}
+		case ECursorMode::PlacingBuilding:
+		{
+			CancelPlacingBuilding();
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
 void ADefaultPlayer::InitHUDPointer()
 {
 	APlayerController* MyController = Cast<APlayerController>(GetController());
 	HUD = Cast<ADefaultPlayerHUD>(MyController->GetHUD());
+	check(HUD);
 }
 
 void ADefaultPlayer::SelectionBegin()
 {
-	if (HUD)
+	if (CursorMode != ECursorMode::None)
 	{
-		HUD->SelectionBegin();
+		return;
 	}
+	CursorMode = ECursorMode::Selecting;
+	HUD->SelectionBegin();
 }
 
 void ADefaultPlayer::SelectionFinished()
 {
-	if (HUD)
+	if (CursorMode != ECursorMode::Selecting)
 	{
-		HUD->SelectionFinished();
+		return;
 	}
+	CursorMode = ECursorMode::None;
+	HUD->SelectionFinished();
 }
 
 void ADefaultPlayer::SelectionMergeBegin()
@@ -255,7 +310,7 @@ void ADefaultPlayer::GiveTagetToSelected()
 	}
 	APlayerController* MyController = Cast<APlayerController>(GetController());
 	FHitResult HitResult;
-	MyController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
+	MyController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, false, HitResult);
 	AActor* Target = HitResult.GetActor();
 	if (Cast<ISelectable>(Target))
 	{
@@ -301,13 +356,38 @@ void ADefaultPlayer::EnableBuildingPlacementMode(bool bEnabled) const
 	}
 }
 
-void ADefaultPlayer::EnableDebugBuildingPlacement(bool bEnabled, UClass* BuildingClass)
+void ADefaultPlayer::StartPlacingBuilding(TSubclassOf<class ABuilding> BuildingClass)
 {
-	if (!bEnabled)
+	if (CursorMode != ECursorMode::None)
 	{
-		GetWorld()->DestroyActor(TempBuilding);
-		TempBuilding = nullptr;
 		return;
 	}
-	TempBuilding = GetWorld()->SpawnActor<AActor>(BuildingClass);
+	CursorMode = ECursorMode::PlacingBuilding;
+	EnableBuildingPlacementMode(true);
+	BuildingPlacer->StartPlacingBuilding(BuildingClass);
+}
+
+void ADefaultPlayer::CancelPlacingBuilding()
+{
+	if (CursorMode != ECursorMode::PlacingBuilding)
+	{
+		return;
+	}
+	CursorMode = ECursorMode::None;
+	EnableBuildingPlacementMode(false);
+	BuildingPlacer->CancelPlacingBuilding();
+}
+
+void ADefaultPlayer::TryPlaceBuilding()
+{
+	if (CursorMode != ECursorMode::PlacingBuilding)
+	{
+		return;
+	}
+	bool bWasPlaced = BuildingPlacer->TryPlaceBuilding();
+	if (bWasPlaced)
+	{
+		CursorMode = ECursorMode::None;
+		EnableBuildingPlacementMode(false);
+	}
 }

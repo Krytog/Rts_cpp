@@ -6,6 +6,14 @@
 #include "GameFramework/Pawn.h"
 #include "DefaultPlayer.generated.h"
 
+UENUM(BlueprintType)
+enum class ECursorMode : uint8
+{
+	None UMETA(DisplayName = "None"),
+	Selecting UMETA(DisplayName = "Selecting"),
+	PlacingBuilding UMETA(DisplayName = "PlacingBuildings"),
+};
+
 UCLASS()
 class RTS_CPP_API ADefaultPlayer : public APawn
 {
@@ -42,6 +50,11 @@ private:
 	float GetScaledMoveSpeed() const;
 	float SpeedScaleCoefficient;
 
+	ECursorMode CursorMode = ECursorMode::None;
+
+	void LeftMouseClicked();
+	void RightMouseClicked();
+
 	// Objects selection section
 
 	void InitHUDPointer();
@@ -68,12 +81,14 @@ private:
 
 	void GiveTagetToSelected();
 
-	// Buildings Network section
+	// Buildings section
 	UPROPERTY()
 	class UBuildingNetworkComponent* BuildingNetwork;
 
-	UFUNCTION(BlueprintCallable)
 	void EnableBuildingPlacementMode(bool bEnabled) const;
+
+	UPROPERTY()
+	class UBuildingPlacerComponent* BuildingPlacer;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
@@ -100,8 +115,10 @@ public:
 	class UBuildingNetworkComponent* GetBuildingNetwork();
 
 	UFUNCTION(BlueprintCallable)
-	void EnableDebugBuildingPlacement(bool bEnabled, UClass* BuildingClass);
+	void StartPlacingBuilding(TSubclassOf<class ABuilding> BuildingClass);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	AActor* TempBuilding = nullptr;
+	UFUNCTION(BlueprintCallable)
+	void CancelPlacingBuilding();
+
+	void TryPlaceBuilding();
 };

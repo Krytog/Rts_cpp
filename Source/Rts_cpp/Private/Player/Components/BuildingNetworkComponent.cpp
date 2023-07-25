@@ -10,7 +10,7 @@ UBuildingNetworkComponent::UBuildingNetworkComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -106,4 +106,18 @@ void UBuildingNetworkComponent::EnableBuildingPlacementMode(bool bEnabled) const
 			LogisticBuilding->SetLogisticFieldVisibility(bEnabled);
 		}
 	}
+}
+
+bool UBuildingNetworkComponent::IsInsideLogisticArea(const FVector& ObjectLocation) const
+{
+	for (const auto* const Building : Buildings)
+	{
+		const float DistanceSquared = FVector::DistSquared(Building->GetActorLocation(), ObjectLocation); // It's faster for obvious reasons
+		const float Radius = Building->GetLogistickRadius();
+		if (DistanceSquared <= Radius * Radius)
+		{
+			return true;
+		}
+	}
+	return false;
 }
