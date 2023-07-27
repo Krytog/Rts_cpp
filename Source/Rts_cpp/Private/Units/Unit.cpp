@@ -1,22 +1,27 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Krytog, 2023
 
 
 #include "Units/Unit.h"
+#include "Components/Image.h"
+#include "Engine/Texture2D.h"
+#include "Blueprint/UserWidget.h"
+#include "Player/DefaultPlayer.h"
+#include "Units/WidgetSelected.h"
 
-// Sets default values
 AUnit::AUnit()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
 void AUnit::Select()
 {
+
 }
 
 void AUnit::Deselect()
 {
+
 }
 
 bool AUnit::IsSelected() const
@@ -24,28 +29,56 @@ bool AUnit::IsSelected() const
 	return false;
 }
 
+int32 AUnit::GetTeamId() const
+{
+	return TeamId;
+}
+
+bool AUnit::IsInTeamWithId(int32 TeamIdToCheck) const
+{
+	return TeamId == TeamIdToCheck;
+}
+
 void AUnit::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+	if (WidgetSelected)
+	{
+		WidgetSelected->RemoveFromParent();
+		WidgetSelected = nullptr; // So GC will destroy it
+	}
 	NotifyThatDestroyed();
 }
 
-// Called when the game starts or when spawned
 void AUnit::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (WidgetSelectedClass)
+	{
+		WidgetSelected = CreateWidget<UWidgetSelected>(GetWorld()->GetFirstPlayerController(), WidgetSelectedClass);
+		check(WidgetSelected);
+		WidgetSelected->SetIconImage(IconSelected);
+	}
 }
 
-// Called every frame
 void AUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
+UWidgetSelected* AUnit::GetWidgetSelected() const
+{
+	return WidgetSelected;
+}
+
 FText AUnit::GetInfoName() const
 {
 	return {};
+}
+
+void AUnit::SetTeamId(int32 NewTeamId)
+{
+	TeamId = NewTeamId;
 }
 

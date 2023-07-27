@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/Selectable.h"
+#include "Units/Unit.h"
 #include "Building.generated.h"
 
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor=true))
@@ -18,7 +19,7 @@ enum class EPlacementFlags : uint8
 ENUM_CLASS_FLAGS(EPlacementFlags);
 
 UCLASS(hidecategories = ("Physics", "Cooking", "Replication", "Rendering", "WorldPartition", "HLOD", "Collision", "Events", "DataLayers", "Input"))
-class RTS_CPP_API ABuilding : public AActor, public ISelectable
+class RTS_CPP_API ABuilding : public AUnit
 {
 	GENERATED_BODY()
 	

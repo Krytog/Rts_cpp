@@ -27,6 +27,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -90,6 +92,17 @@ private:
 	UPROPERTY()
 	class UBuildingPlacerComponent* BuildingPlacer;
 
+	// UI section
+
+	void InitUIWidget();
+
+	UPROPERTY()
+	class UPlayerUIWidget* UIWidget;
+
+	// Team section
+	
+	int32 TeamId = -1;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
 	float CameraArmDistance = 150.0f;
@@ -106,6 +119,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CameraMovement")
 	float CameraMoveSpeed = 250.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UPlayerUIWidget> UIWidgetClass;
+
 public:
 	void UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects);
 	void RemoveFromSelectedWhenDestroyed(const AActor* Object);
@@ -121,4 +137,9 @@ public:
 	void CancelPlacingBuilding();
 
 	void TryPlaceBuilding();
+
+	UFUNCTION(BlueprintCallable)
+	void SetTeamId(int32 NewTeamId);
+
+	int32 GetTeamId() const;
 };

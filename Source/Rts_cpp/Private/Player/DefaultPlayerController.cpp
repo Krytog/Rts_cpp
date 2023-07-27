@@ -2,6 +2,7 @@
 
 
 #include "DefaultPlayerController.h"
+#include "Blueprint/UserWidget.h"
 
 ADefaultPlayerController::ADefaultPlayerController()
 {

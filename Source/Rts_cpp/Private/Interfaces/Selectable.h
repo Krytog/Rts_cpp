@@ -25,6 +25,9 @@ public:
 	virtual void Select() = 0;
 	virtual void Deselect() = 0;
 	virtual bool IsSelected() const = 0;
+	virtual int32 GetTeamId() const = 0;
+	virtual bool IsInTeamWithId(int32 TeamId) const = 0;
+	virtual class UWidgetSelected* GetWidgetSelected() const = 0;
 
 	virtual FText GetInfoName() const = 0;
 

@@ -12,6 +12,9 @@
 #include "Math/UnrealMathUtility.h"
 #include "Player/Components/BuildingNetworkComponent.h"
 #include "Player/Components/BuildingPlacerComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "Player/PlayerUIWidget.h"
+#include "Units/WidgetSelected.h"
 
 #define CAMERA_LAG_SPEED 2.0f
 
@@ -45,6 +48,14 @@ void ADefaultPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	InitHUDPointer();
+	InitUIWidget();
+}
+
+void ADefaultPlayer::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	UIWidget->RemoveFromParent();
+	UIWidget = nullptr; // So it will eventually be destroyed by GC
 }
 
 // Called every frame
@@ -68,6 +79,10 @@ void ADefaultPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ADefaultPlayer::MoveCamera()
 {
+	if (CursorMode == ECursorMode::Selecting) // No camera movement when selecting
+	{
+		return;
+	}
 	FVector2D MousePosition;
 	const bool bOverGameWindow = GetWorld()->GetGameViewport()->GetMousePosition(MousePosition);
 	if (!bOverGameWindow) {
@@ -242,6 +257,7 @@ void ADefaultPlayer::AddObjectToSelected(AActor* Object)
 	FDelegateHandle DelegateHandle = Selectable->OnDestroyed().AddUObject(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
 	SelectedObjects.Add(Object);
 	SelectedObjectsDelegateHandlers.Add(Object, DelegateHandle);
+	UIWidget->AddSelectedUnitWidget(Selectable->GetWidgetSelected());
 }
 
 void ADefaultPlayer::RemoveObjectFromSelected(AActor* Object)
@@ -259,6 +275,7 @@ void ADefaultPlayer::RemoveObjectFromSelected(AActor* Object)
 		Selectable->Deselect();
 	}
 	Selectable->OnDestroyed().Remove(DelegateHandle);
+	Selectable->GetWidgetSelected()->RemoveFromParent();
 }
 
 void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(const AActor* Object)
@@ -310,7 +327,7 @@ void ADefaultPlayer::GiveTagetToSelected()
 	}
 	APlayerController* MyController = Cast<APlayerController>(GetController());
 	FHitResult HitResult;
-	MyController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, false, HitResult);
+	MyController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
 	AActor* Target = HitResult.GetActor();
 	if (Cast<ISelectable>(Target))
 	{
@@ -391,3 +408,23 @@ void ADefaultPlayer::TryPlaceBuilding()
 		EnableBuildingPlacementMode(false);
 	}
 }
+
+void ADefaultPlayer::InitUIWidget()
+{
+	if (UIWidgetClass && IsLocallyControlled())
+	{
+		UIWidget = CreateWidget<UPlayerUIWidget>(Cast<APlayerController>(GetController()), UIWidgetClass);
+		UIWidget->AddToViewport();
+	}
+}
+
+void ADefaultPlayer::SetTeamId(int32 NewTeamId)
+{
+	TeamId = NewTeamId;
+}
+
+int32 ADefaultPlayer::GetTeamId() const
+{
+	return TeamId;
+}
+
