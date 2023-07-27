@@ -3,6 +3,22 @@
 
 #include "Units/WidgetSelected.h"
 #include "Components/Image.h"
+#include "Player/DefaultPlayer.h"
+
+FReply UWidgetSelected::NativeOnMouseButtonDown(const FGeometry &Geometry, const FPointerEvent& MouseEvent)
+{
+	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
+	{
+		ADefaultPlayer* Player = Cast<ADefaultPlayer>(GetOwningPlayer()->GetPawn());
+		if (Player)
+		{
+			TArray<AActor*> NewSelectedObjects;
+			NewSelectedObjects.Add(Unit);
+			Player->UpdateSelectedObjects(NewSelectedObjects);
+		}
+	}
+	return FReply::Handled();
+}
 
 void UWidgetSelected::BindToUnit(AActor* UnitToBind)
 {

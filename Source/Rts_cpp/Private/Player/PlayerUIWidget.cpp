@@ -4,6 +4,7 @@
 #include "Player/PlayerUIWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Units/WidgetSelected.h"
+#include "Components/HorizontalBoxSlot.h"
 
 void UPlayerUIWidget::AddSelectedUnitWidget(UWidgetSelected* Widget)
 {
@@ -33,20 +34,22 @@ void UPlayerUIWidget::RemoveSelectedUintWidget(UWidgetSelected* Widget)
 
 void UPlayerUIWidget::AddSelectedUintWidgetToCorrespondingLayer(UWidget* Widget, int32 AlreadyIn)
 {
-	if (AlreadyIn == 24)
+	if (AlreadyIn == 36)
 	{
 		return;
 	}
-	if (AlreadyIn < 8)
+	UPanelSlot* InLayerSlot;
+	if (AlreadyIn < 12)
 	{
-		SelectionLayer1->AddChild(Widget);
+		InLayerSlot = SelectionLayer1->AddChild(Widget);
 	}
-	else if (AlreadyIn < 16)
+	else if (AlreadyIn < 24)
 	{
-		SelectionLayer2->AddChild(Widget);
+		InLayerSlot = SelectionLayer2->AddChild(Widget);
 	}
 	else
 	{
-		SelectionLayer3->AddChild(Widget);
+		InLayerSlot = SelectionLayer3->AddChild(Widget);
 	}
+	Cast<UHorizontalBoxSlot>(InLayerSlot)->SetPadding(FMargin(5.0f, 0.0f));
 }

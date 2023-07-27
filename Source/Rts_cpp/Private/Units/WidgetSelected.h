@@ -15,6 +15,8 @@ class UWidgetSelected : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	FReply NativeOnMouseButtonDown(const FGeometry &Geometry, const FPointerEvent& MouseEvent) override;
+
 	void BindToUnit(AActor* UnitToBind);
 	AActor* GetBindedUnit() const;
 
