@@ -44,7 +44,8 @@ void AUnit::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 	if (WidgetSelected)
 	{
-		WidgetSelected->RemoveFromParent();
+		WidgetSelected->RemoveFromParentNotified(); // So parent widget will handle it 
+		WidgetSelected->BindToUnit(nullptr); // Invalidate reference to this unit
 		WidgetSelected = nullptr; // So GC will destroy it
 	}
 	NotifyThatDestroyed();
@@ -58,6 +59,7 @@ void AUnit::BeginPlay()
 		WidgetSelected = CreateWidget<UWidgetSelected>(GetWorld()->GetFirstPlayerController(), WidgetSelectedClass);
 		check(WidgetSelected);
 		WidgetSelected->SetIconImage(IconSelected);
+		WidgetSelected->BindToUnit(this);
 	}
 }
 

@@ -275,7 +275,7 @@ void ADefaultPlayer::RemoveObjectFromSelected(AActor* Object)
 		Selectable->Deselect();
 	}
 	Selectable->OnDestroyed().Remove(DelegateHandle);
-	Selectable->GetWidgetSelected()->RemoveFromParent();
+	Selectable->GetWidgetSelected()->RemoveFromParentNotified();
 }
 
 void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(const AActor* Object)

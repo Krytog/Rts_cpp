@@ -18,3 +18,14 @@ void UWidgetSelected::SetIconImage(UTexture2D* Image)
 {
 	IconSelected->SetBrushFromTexture(Image);
 }
+
+UWidgetSelected::FEventRemovedFromParent& UWidgetSelected::OnRemovedFromParent()
+{
+	return EventRemovedFromParent;
+}
+
+void UWidgetSelected::RemoveFromParentNotified()
+{
+	RemoveFromParent();
+	EventRemovedFromParent.Broadcast(this);
+}

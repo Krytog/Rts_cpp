@@ -14,6 +14,18 @@ class UWidgetSelected : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	void BindToUnit(AActor* UnitToBind);
+	AActor* GetBindedUnit() const;
+
+	void SetIconImage(class UTexture2D* Image);
+
+	DECLARE_EVENT_OneParam(UWidgetSelected, FEventRemovedFromParent, UWidgetSelected*)
+
+	FEventRemovedFromParent& OnRemovedFromParent();
+
+	void RemoveFromParentNotified();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (BindWidget))
 	class UImage* IconSelected;
@@ -21,9 +33,6 @@ protected:
 	UPROPERTY()
 	AActor* Unit = nullptr;
 
-public:
-	void BindToUnit(AActor* UnitToBind);
-	AActor* GetBindedUnit() const;
-
-	void SetIconImage(class UTexture2D* Image);
+private:
+	FEventRemovedFromParent EventRemovedFromParent;
 };
