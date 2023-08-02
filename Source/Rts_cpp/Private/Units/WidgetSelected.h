@@ -17,7 +17,7 @@ class UWidgetSelected : public UUserWidget
 public:
 	FReply NativeOnMouseButtonDown(const FGeometry &Geometry, const FPointerEvent& MouseEvent) override;
 
-	void BindToUnit(AActor* UnitToBind);
+	void BindToUnit(class AUnit* UnitToBind);
 	AActor* GetBindedUnit() const;
 
 	void SetIconImage(class UTexture2D* Image);
@@ -33,7 +33,7 @@ protected:
 	class UImage* IconSelected;
 
 	UPROPERTY()
-	AActor* Unit = nullptr;
+	AUnit* Unit = nullptr;
 
 private:
 	FEventRemovedFromParent EventRemovedFromParent;

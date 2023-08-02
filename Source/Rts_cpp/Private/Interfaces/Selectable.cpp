@@ -12,5 +12,5 @@ ISelectable::FDestroyedEvent& ISelectable::OnDestroyed()
 
 void ISelectable::NotifyThatDestroyed()
 {
-	DestroyedEvent.Broadcast(Cast<AActor>(this));
+	DestroyedEvent.Broadcast(this);
 }

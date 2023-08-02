@@ -2,6 +2,7 @@
 
 
 #include "Units/WidgetSelected.h"
+#include "Units/Unit.h"
 #include "Components/Image.h"
 #include "Player/DefaultPlayer.h"
 
@@ -12,7 +13,7 @@ FReply UWidgetSelected::NativeOnMouseButtonDown(const FGeometry &Geometry, const
 		ADefaultPlayer* Player = Cast<ADefaultPlayer>(GetOwningPlayer()->GetPawn());
 		if (Player)
 		{
-			TArray<AActor*> NewSelectedObjects;
+			TArray<AUnit*> NewSelectedObjects;
 			NewSelectedObjects.Add(Unit);
 			Player->UpdateSelectedObjects(NewSelectedObjects);
 		}
@@ -20,7 +21,7 @@ FReply UWidgetSelected::NativeOnMouseButtonDown(const FGeometry &Geometry, const
 	return FReply::Handled();
 }
 
-void UWidgetSelected::BindToUnit(AActor* UnitToBind)
+void UWidgetSelected::BindToUnit(AUnit* UnitToBind)
 {
 	Unit = UnitToBind;
 }

@@ -40,7 +40,7 @@ void UBuildingNetworkComponent::AddBuilding(AActor* Building)
 	{
 		return;
 	}
-	BuildingCasted->ISelectable::OnDestroyed().AddUObject(this, &UBuildingNetworkComponent::RemoveBuilding);
+	BuildingCasted->ISelectable::OnDestroyed().AddUObject(this, &UBuildingNetworkComponent::RemoveDestroyedBuilding);
 	Buildings.Add(BuildingCasted);
 	Graph.AddVertexToGraph(Building);
 	CalculateConnections(BuildingCasted);
@@ -95,6 +95,11 @@ void UBuildingNetworkComponent::CalculateConnections(const ABuilding* Building)
 			Graph.ConnectVertices(Building, OtherBuilding);
 		}
 	}
+}
+
+void UBuildingNetworkComponent::RemoveDestroyedBuilding(const ISelectable* Object)
+{
+	RemoveBuilding(Cast<ABuilding>(Object));
 }
 
 void UBuildingNetworkComponent::EnableBuildingPlacementMode(bool bEnabled) const

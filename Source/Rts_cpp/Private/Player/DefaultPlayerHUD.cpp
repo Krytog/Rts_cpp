@@ -4,6 +4,7 @@
 #include "Player/DefaultPlayerHUD.h"
 #include "Player/DefaultPlayer.h"
 #include "EngineUtils.h"
+#include "Units/Unit.h"
 
 void ADefaultPlayerHUD::SelectionBegin()
 {
@@ -15,7 +16,7 @@ void ADefaultPlayerHUD::SelectionUpdate()
 {
 	DrawRect(Color, StartPosition.X, StartPosition.Y, CurrentPosition.X - StartPosition.X, CurrentPosition.Y - StartPosition.Y);
 	GetOwningPlayerController()->GetMousePosition(CurrentPosition.X, CurrentPosition.Y);
-	TArray<AActor*> AllObjectsInRect;
+	TArray<AUnit*> AllObjectsInRect;
 	GetActorsInSelectionRectangle(StartPosition, CurrentPosition, AllObjectsInRect, false, false);
 	ADefaultPlayer* Player = Cast<ADefaultPlayer>(GetOwningPawn());
 	Player->UpdateSelectedObjects(AllObjectsInRect);

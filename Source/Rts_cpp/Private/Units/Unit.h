@@ -7,7 +7,7 @@
 #include "Interfaces/Selectable.h"
 #include "Unit.generated.h"
 
-UCLASS()
+UCLASS(hidecategories = ("Physics", "Cooking", "Replication", "Rendering", "WorldPartition", "HLOD", "Collision", "Events", "DataLayers", "Input", "Actor", "Actor Tick"))
 class AUnit : public AActor, public ISelectable
 {
 	GENERATED_BODY()
@@ -25,22 +25,31 @@ public:
 	virtual bool IsInTeamWithId(int32 TeamIdToCheck) const override;
 
 	virtual FText GetInfoName() const override;
+	virtual int32 GetPriority() const override;
 
 	virtual void SetTeamId(int32 NewTeamId);
+
+	friend uint32 GetTypeHash(const AUnit* Unit);
 
 protected:
 	virtual void BeginPlay() override;
 
 	int32 TeamId = -1;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, category = "Icons|Selected")
+	/* Class for widget that will be used in player UI selection panel*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, category = "Selected|Widget")
 	TSubclassOf<class UWidgetSelected> WidgetSelectedClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, category = "Icons|Selected")
+	/* Image for widget that will be used in player UI selection Panel*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, category = "Selected|Widget")
 	class UTexture2D* IconSelected;
 
 	UPROPERTY()
 	class UWidgetSelected* WidgetSelected = nullptr;
+
+	/* Priority in group of selected units. Units with higher number have greater priority */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, category = "Selected|Priority", meta=(DisplayName="Priority"))
+	int32 SelectionPriority = 0;
 
 public:	
 	virtual void Tick(float DeltaTime) override;

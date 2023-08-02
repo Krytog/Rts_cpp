@@ -34,7 +34,7 @@ public:
 	bool IsTargetSet() const;
 	void ResetTarget();
 
-	void SetTargetLocationWhenTargetDestroyed(const AActor* Target);
+	void SetTargetLocationWhenTargetDestroyed(const class ISelectable* Destroyed);
 
 	void SetArrowVisibility(bool bNewVisibility);
 

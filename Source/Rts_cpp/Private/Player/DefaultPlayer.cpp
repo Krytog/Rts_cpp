@@ -15,6 +15,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Player/PlayerUIWidget.h"
 #include "Units/WidgetSelected.h"
+#include "Units/Unit.h"
 
 #define CAMERA_LAG_SPEED 2.0f
 
@@ -225,63 +226,60 @@ void ADefaultPlayer::ForceEnableSelectionVisibilityOfSelected(bool bNewVisibilit
 	{
 		for (auto* Object : SelectedObjects)
 		{
-			if (ISelectable* Selectable = Cast<ISelectable>(Object))
-			{
-				Selectable->Select();
-			}
+			Object->Select();
 		}
 	}
 	else
 	{
 		for (auto* Object : SelectedObjects)
 		{
-			if (ISelectable* Selectable = Cast<ISelectable>(Object))
-			{
-				Selectable->Deselect();
-			}
+			Object->Deselect();
 		}
 	}
 }
 
-void ADefaultPlayer::AddObjectToSelected(AActor* Object)
+void ADefaultPlayer::AddUnitToSelected(AUnit* Unit)
 {
-	ISelectable* Selectable = Cast<ISelectable>(Object);
-	if (!Selectable)
+	if (!Unit)
 	{
 		return;
 	}
-	if (!Selectable->IsSelected())
+	if (!Unit->IsSelected())
 	{
-		Selectable->Select();
+		Unit->Select();
 	}
-	FDelegateHandle DelegateHandle = Selectable->OnDestroyed().AddUObject(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
-	SelectedObjects.Add(Object);
-	SelectedObjectsDelegateHandlers.Add(Object, DelegateHandle);
-	UIWidget->AddSelectedUnitWidget(Selectable->GetWidgetSelected());
+	FDelegateHandle DelegateHandle = Unit->ISelectable::OnDestroyed().AddUObject(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
+	SelectedObjects.Add(Unit);
+	SelectedObjectsDelegateHandlers.Add(Unit, DelegateHandle);
+	UIWidget->AddSelectedUnitWidget(Unit->GetWidgetSelected());
 }
 
-void ADefaultPlayer::RemoveObjectFromSelected(AActor* Object)
+void ADefaultPlayer::RemoveUnitFromSelected(AUnit* Unit)
 {
-	ISelectable* Selectable = Cast<ISelectable>(Object);
-	if (!Selectable)
+	if (!Unit)
 	{
 		return;
 	}
 	FDelegateHandle DelegateHandle;
-	SelectedObjects.Remove(Object);
-	SelectedObjectsDelegateHandlers.RemoveAndCopyValue(Object, DelegateHandle);
-	if (Selectable->IsSelected())
+	SelectedObjects.Remove(Unit);
+	SelectedObjectsDelegateHandlers.RemoveAndCopyValue(Unit, DelegateHandle);
+	if (Unit->IsSelected())
 	{
-		Selectable->Deselect();
+		Unit->Deselect();
 	}
-	Selectable->OnDestroyed().Remove(DelegateHandle);
-	Selectable->GetWidgetSelected()->RemoveFromParentNotified();
+	Unit->ISelectable::OnDestroyed().Remove(DelegateHandle);
+	Unit->GetWidgetSelected()->RemoveFromParentNotified();
 }
 
-void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(const AActor* Object)
+void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(const ISelectable* Object)
 {
-	SelectedObjects.Remove(Object);
-	SelectedObjectsDelegateHandlers.Remove(Object);
+	const AUnit* Unit = Cast<AUnit>(Object);
+	if (!Unit)
+	{
+		return;
+	}
+	SelectedObjects.Remove(Unit);
+	SelectedObjectsDelegateHandlers.Remove(Unit);
 }
 
 UBuildingNetworkComponent* ADefaultPlayer::GetBuildingNetwork()
@@ -289,33 +287,25 @@ UBuildingNetworkComponent* ADefaultPlayer::GetBuildingNetwork()
 	return BuildingNetwork;
 }
 
-void ADefaultPlayer::UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects)
+bool ADefaultPlayer::SortingFunctor::operator()(const AUnit& LHS, const AUnit& RHS) const
+{
+	return LHS.GetPriority() > RHS.GetPriority();
+}
+
+void ADefaultPlayer::UpdateSelectedObjects(TArray<AUnit*>& NewSelectedObjects)
 {
 	if (!bMerging)
 	{
-		TSet<AActor*> AlreadyInSet;
-		for (auto* const Object : NewSelectedObjects)
-		{
-			if (SelectedObjects.Contains(Object))
-			{
-				AlreadyInSet.Add(Object);
-			}
-		}
 		for (auto* const Object : SelectedObjects)
 		{
-			if (!AlreadyInSet.Contains(Object))
-			{
-				RemoveObjectFromSelected(Object);
-			}
+			RemoveUnitFromSelected(Object);
 		}
 	}
-	for (auto* const Object : NewSelectedObjects)
+	NewSelectedObjects.Sort(ADefaultPlayer::SortingFunctor());
+	int32 IndexToAdd = 0;
+	while (SelectedObjects.Num() < MaxSelectedInGroup && IndexToAdd < NewSelectedObjects.Num())
 	{
-		if (SelectedObjects.Contains(Object))
-		{
-			continue;
-		}
-		AddObjectToSelected(Object);
+		AddUnitToSelected(NewSelectedObjects[IndexToAdd++]);
 	}
 }
 

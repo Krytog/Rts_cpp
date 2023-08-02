@@ -67,19 +67,27 @@ private:
 	void SelectionMergeFinished();
 	bool bMerging = false;
 
-	// Sometimes various events affect selection visibility of selected objects, this function manually changes their selection visibility
+	struct SortingFunctor
+	{
+		bool operator()(const class AUnit& LHS, const class AUnit& RHS) const;
+	};
+
+	/* This property should be changed only if current player UI widget is supporting new number */
+	int32 MaxSelectedInGroup = 36;
+
+	/* Sometimes various events affect selection visibility of selected objects, this function manually changes their selection visibility */
 	void ForceEnableSelectionVisibilityOfSelected(bool bNewVisibility) const;
 
 	UPROPERTY()
 	class ADefaultPlayerHUD* HUD;
 
 	UPROPERTY()
-	TSet<AActor*> SelectedObjects;
+	TSet<class AUnit*> SelectedObjects;
 
-	TMap<AActor*, FDelegateHandle> SelectedObjectsDelegateHandlers;
+	TMap<AUnit*, FDelegateHandle> SelectedObjectsDelegateHandlers;
 
-	void AddObjectToSelected(AActor* Object);
-	void RemoveObjectFromSelected(AActor* Object);
+	void AddUnitToSelected(AUnit* Unit);
+	void RemoveUnitFromSelected(AUnit* Unit);
 
 	void GiveTagetToSelected();
 
@@ -123,8 +131,8 @@ protected:
 	TSubclassOf<class UPlayerUIWidget> UIWidgetClass;
 
 public:
-	void UpdateSelectedObjects(const TArray<AActor*>& NewSelectedObjects);
-	void RemoveFromSelectedWhenDestroyed(const AActor* Object);
+	void UpdateSelectedObjects(TArray<AUnit*>& NewSelectedObjects);
+	void RemoveFromSelectedWhenDestroyed(const class ISelectable* Object);
 
 	FVector GetLocationUnderCursor() const;
 

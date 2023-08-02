@@ -79,8 +79,17 @@ FText AUnit::GetInfoName() const
 	return {};
 }
 
+int32 AUnit::GetPriority() const
+{
+	return SelectionPriority;
+}
+
 void AUnit::SetTeamId(int32 NewTeamId)
 {
 	TeamId = NewTeamId;
 }
 
+uint32 GetTypeHash(const AUnit* Unit)
+{
+	return GetTypeHash(Cast<AActor>(Unit));
+}

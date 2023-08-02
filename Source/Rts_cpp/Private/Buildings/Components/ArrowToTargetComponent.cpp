@@ -83,7 +83,7 @@ void UArrowToTargetComponent::ResetTarget()
 	ArrowActor->SetVisibility(false);
 }
 
-void UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed(const AActor* Target)
+void UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed(const ISelectable* Destroyed)
 {
 	TargetActor = nullptr;
 	SetComponentTickEnabled(false);

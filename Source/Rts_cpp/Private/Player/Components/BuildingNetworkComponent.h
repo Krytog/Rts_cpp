@@ -42,6 +42,9 @@ private:
 	bool IsToBeConnected(const ABuilding* First, const ABuilding* Second) const;
 	void CalculateConnections(const ABuilding* Building);
 
+	/* It uses event from ISelectable interface, therefore it takes ISelectable* */
+	void RemoveDestroyedBuilding(const class ISelectable* Object);
+
 	class FGraphWithPointers Graph;
 
 	UPROPERTY()
