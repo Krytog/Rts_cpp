@@ -31,6 +31,8 @@ public:
 
 	friend uint32 GetTypeHash(const AUnit* Unit);
 
+	virtual FActorEndPlaySignature& OnEndPlayEvent() override;
+
 protected:
 	virtual void BeginPlay() override;
 

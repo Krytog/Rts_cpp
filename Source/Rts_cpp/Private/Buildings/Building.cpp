@@ -89,7 +89,6 @@ void ABuilding::Tick(float DeltaTime)
 void ABuilding::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	NotifyThatDestroyed();
 }
 
 bool ABuilding::IsSelected() const

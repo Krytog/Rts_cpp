@@ -33,28 +33,23 @@ void UBuildingNetworkComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	DrawDebugGraphConnections();
 }
 
-void UBuildingNetworkComponent::AddBuilding(AActor* Building)
+void UBuildingNetworkComponent::AddBuilding(ABuilding* Building)
 {
-	ABuilding* BuildingCasted = Cast<ABuilding>(Building);
-	if (!BuildingCasted)
-	{
-		return;
-	}
-	BuildingCasted->ISelectable::OnDestroyed().AddUObject(this, &UBuildingNetworkComponent::RemoveDestroyedBuilding);
-	Buildings.Add(BuildingCasted);
+	Building->OnEndPlayEvent().AddDynamic(this, &UBuildingNetworkComponent::RemoveDestroyedBuilding);
+	Buildings.Add(Building);
 	Graph.AddVertexToGraph(Building);
-	CalculateConnections(BuildingCasted);
+	CalculateConnections(Building);
 	Graph.CalculateComponents();
 }
 
-void UBuildingNetworkComponent::RemoveBuilding(const AActor* Building)
+void UBuildingNetworkComponent::RemoveBuilding(ABuilding* Building)
 {
 	Graph.RemoveVertex(Building);
-	Buildings.RemoveSingleSwap(Cast<ABuilding>(const_cast<AActor*>(Building))); // It's a bad practice
+	Buildings.RemoveSingleSwap(Building);
 	Graph.CalculateComponents();
 }
 
-int32 UBuildingNetworkComponent::GetComponentOf(const AActor* Building) const
+int32 UBuildingNetworkComponent::GetComponentOf(const ABuilding* Building) const
 {
 	return Graph.GetComponentOf(Building);
 }
@@ -97,7 +92,7 @@ void UBuildingNetworkComponent::CalculateConnections(const ABuilding* Building)
 	}
 }
 
-void UBuildingNetworkComponent::RemoveDestroyedBuilding(const ISelectable* Object)
+void UBuildingNetworkComponent::RemoveDestroyedBuilding(AActor* Object, EEndPlayReason::Type EndPlayReason)
 {
 	RemoveBuilding(Cast<ABuilding>(Object));
 }

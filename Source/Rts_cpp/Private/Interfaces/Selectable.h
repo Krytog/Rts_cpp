@@ -37,12 +37,5 @@ public:
 	// Functions for getting object's info
 	virtual FText GetInfoName() const = 0;
 
-	DECLARE_EVENT_OneParam(ISelectable, FDestroyedEvent, const ISelectable*);
-	FDestroyedEvent& OnDestroyed();
-
-protected:
-	void NotifyThatDestroyed();
-
-private:
-	FDestroyedEvent DestroyedEvent;
+	virtual FActorEndPlaySignature& OnEndPlayEvent() = 0;
 };

@@ -58,7 +58,7 @@ void UArrowToTargetComponent::SetTarget(AActor* Target)
 	SetComponentTickEnabled(true);
 	if (ISelectable* Selectable = Cast<ISelectable>(Target))
 	{
-		DestroyDelegateHadler = Selectable->OnDestroyed().AddUObject(this, &UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed);
+		Selectable->OnEndPlayEvent().AddDynamic(this, &UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed);
 	}
 }
 
@@ -83,8 +83,12 @@ void UArrowToTargetComponent::ResetTarget()
 	ArrowActor->SetVisibility(false);
 }
 
-void UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed(const ISelectable* Destroyed)
+void UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed(AActor* Destroyed, EEndPlayReason::Type EndPlayReason)
 {
+	if (EndPlayReason != EEndPlayReason::Destroyed)
+	{
+		return;
+	}
 	TargetActor = nullptr;
 	SetComponentTickEnabled(false);
 }
@@ -98,7 +102,7 @@ void UArrowToTargetComponent::ClearTargetActor()
 {
 	if (ISelectable* Selectable = Cast<ISelectable>(TargetActor))
 	{
-		Selectable->OnDestroyed().Remove(DestroyDelegateHadler);
+		Selectable->OnEndPlayEvent().RemoveDynamic(this, &UArrowToTargetComponent::SetTargetLocationWhenTargetDestroyed);
 	}
 	TargetActor = nullptr;
 	SetComponentTickEnabled(false);

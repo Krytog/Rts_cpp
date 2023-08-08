@@ -116,6 +116,9 @@ void ADefaultPlayer::ScrollCamera(float Value)
 	{
 		return;
 	}
+	if (CursorMode != ECursorMode::None) {
+		return;
+	}
 	Value *= -1; // Multiply it by -1 because we want to zoom in on scrolling up, in that case Value would be 1, but height must be decreased
 	const float Height = GetActorLocation().Z;
 	const bool bZoomIn = (Value < 0 && Height > MinCameraHeight);
@@ -248,9 +251,8 @@ void ADefaultPlayer::AddUnitToSelected(AUnit* Unit)
 	{
 		Unit->Select();
 	}
-	FDelegateHandle DelegateHandle = Unit->ISelectable::OnDestroyed().AddUObject(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
+	Unit->OnEndPlayEvent().AddDynamic(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
 	SelectedObjects.Add(Unit);
-	SelectedObjectsDelegateHandlers.Add(Unit, DelegateHandle);
 	UIWidget->AddSelectedUnitWidget(Unit->GetWidgetSelected());
 }
 
@@ -260,26 +262,27 @@ void ADefaultPlayer::RemoveUnitFromSelected(AUnit* Unit)
 	{
 		return;
 	}
-	FDelegateHandle DelegateHandle;
 	SelectedObjects.Remove(Unit);
-	SelectedObjectsDelegateHandlers.RemoveAndCopyValue(Unit, DelegateHandle);
 	if (Unit->IsSelected())
 	{
 		Unit->Deselect();
 	}
-	Unit->ISelectable::OnDestroyed().Remove(DelegateHandle);
+	Unit->OnEndPlayEvent().RemoveDynamic(this, &ADefaultPlayer::RemoveFromSelectedWhenDestroyed);
 	Unit->GetWidgetSelected()->RemoveFromParentNotified();
 }
 
-void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(const ISelectable* Object)
+void ADefaultPlayer::RemoveFromSelectedWhenDestroyed(AActor* Object, EEndPlayReason::Type EndPlayReason)
 {
+	if (EndPlayReason != EEndPlayReason::Destroyed)
+	{
+		return;
+	}
 	const AUnit* Unit = Cast<AUnit>(Object);
 	if (!Unit)
 	{
 		return;
 	}
 	SelectedObjects.Remove(Unit);
-	SelectedObjectsDelegateHandlers.Remove(Unit);
 }
 
 UBuildingNetworkComponent* ADefaultPlayer::GetBuildingNetwork()

@@ -27,10 +27,10 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
-	void AddBuilding(AActor* Building);
-	void RemoveBuilding(const AActor* Building);
+	void AddBuilding(ABuilding* Building);
+	void RemoveBuilding(ABuilding* Building);
 
-	int32 GetComponentOf(const AActor* Building) const;
+	int32 GetComponentOf(const ABuilding* Building) const;
 
 	void DrawDebugGraphConnections() const;
 
@@ -43,7 +43,7 @@ private:
 	void CalculateConnections(const ABuilding* Building);
 
 	/* It uses event from ISelectable interface, therefore it takes ISelectable* */
-	void RemoveDestroyedBuilding(const class ISelectable* Object);
+	void RemoveDestroyedBuilding(AActor* Object, EEndPlayReason::Type EndPlayReason);
 
 	class FGraphWithPointers Graph;
 

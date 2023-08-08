@@ -48,7 +48,11 @@ void AUnit::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		WidgetSelected->BindToUnit(nullptr); // Invalidate reference to this unit
 		WidgetSelected = nullptr; // So GC will destroy it
 	}
-	NotifyThatDestroyed();
+}
+
+FActorEndPlaySignature& AUnit::OnEndPlayEvent()
+{
+	return OnEndPlay;
 }
 
 void AUnit::BeginPlay()

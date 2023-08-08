@@ -3,6 +3,7 @@
 
 #include "Buildings/Components/BuildingNetworkAgentComponent.h"
 #include "Player/Components/BuildingNetworkComponent.h"
+#include "Buildings/Building.h"
 
 // Sets default values for this component's properties
 UBuildingNetworkAgentComponent::UBuildingNetworkAgentComponent()
@@ -35,6 +36,7 @@ void UBuildingNetworkAgentComponent::TickComponent(float DeltaTime, ELevelTick T
 void UBuildingNetworkAgentComponent::InsertInNetwork(UBuildingNetworkComponent* Network)
 {
 	BuildingNetwork = Network;
-	BuildingNetwork->AddBuilding(GetOwner());
+	ABuilding* Building = Cast<ABuilding>(GetOwner());
+	BuildingNetwork->AddBuilding(Building);
 }
 

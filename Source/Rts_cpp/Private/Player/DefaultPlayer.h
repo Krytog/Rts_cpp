@@ -67,6 +67,10 @@ private:
 	void SelectionMergeFinished();
 	bool bMerging = false;
 
+	/* Callback for OnEndPlayEvent */
+	UFUNCTION()
+	void RemoveFromSelectedWhenDestroyed(AActor* Object, EEndPlayReason::Type EndPlayReason);
+
 	/* This property should be changed only if current player UI widget is supporting new number */
 	int32 MaxSelectedInGroup = 36;
 
@@ -78,8 +82,6 @@ private:
 
 	UPROPERTY()
 	TSet<class AUnit*> SelectedObjects;
-
-	TMap<AUnit*, FDelegateHandle> SelectedObjectsDelegateHandlers;
 
 	void AddUnitToSelected(AUnit* Unit);
 	void RemoveUnitFromSelected(AUnit* Unit);
@@ -127,7 +129,6 @@ protected:
 
 public:
 	void UpdateSelectedObjects(TArray<AUnit*>& NewSelectedObjects);
-	void RemoveFromSelectedWhenDestroyed(const class ISelectable* Object);
 
 	FVector GetLocationUnderCursor() const;
 
