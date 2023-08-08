@@ -67,11 +67,6 @@ private:
 	void SelectionMergeFinished();
 	bool bMerging = false;
 
-	struct SortingFunctor
-	{
-		bool operator()(const class AUnit& LHS, const class AUnit& RHS) const;
-	};
-
 	/* This property should be changed only if current player UI widget is supporting new number */
 	int32 MaxSelectedInGroup = 36;
 

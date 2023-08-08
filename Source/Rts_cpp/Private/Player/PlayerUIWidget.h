@@ -33,7 +33,13 @@ protected:
 public:
 	void AddSelectedUnitWidget(class UWidgetSelected* Widget);
 
-	void RemoveSelectedUintWidget(class UWidgetSelected* Widget);
+	void RemoveSelectedUnitWidget(class UWidgetSelected* Widget);
+
+	/* This function will completely rebuild SelectedUnitsPanel according to current order of SelectedObject */
+	void ReorderSelectedUnitWidgets(const TSet<class AUnit*>& SelectedObjects);
+
+	/* This function will rebuild SelectedUnitsPanel maintaining their relative order */
+	void RebuildSelectedUnitWidgets();
 
 private:
 	void AddSelectedUintWidgetToCorrespondingLayer(class UWidget* Widget, int32 AlreadyIn);

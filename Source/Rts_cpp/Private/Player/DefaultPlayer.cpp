@@ -287,11 +287,6 @@ UBuildingNetworkComponent* ADefaultPlayer::GetBuildingNetwork()
 	return BuildingNetwork;
 }
 
-bool ADefaultPlayer::SortingFunctor::operator()(const AUnit& LHS, const AUnit& RHS) const
-{
-	return LHS.GetPriority() > RHS.GetPriority();
-}
-
 void ADefaultPlayer::UpdateSelectedObjects(TArray<AUnit*>& NewSelectedObjects)
 {
 	if (!bMerging)
@@ -301,11 +296,20 @@ void ADefaultPlayer::UpdateSelectedObjects(TArray<AUnit*>& NewSelectedObjects)
 			RemoveUnitFromSelected(Object);
 		}
 	}
-	NewSelectedObjects.Sort(ADefaultPlayer::SortingFunctor());
+	NewSelectedObjects.Sort([](const AUnit& LHS, const AUnit& RHS) { return LHS.GetPriority() > RHS.GetPriority(); });
 	int32 IndexToAdd = 0;
+	int32 PreviousNumSelectedObjects = SelectedObjects.Num();
 	while (SelectedObjects.Num() < MaxSelectedInGroup && IndexToAdd < NewSelectedObjects.Num())
 	{
-		AddUnitToSelected(NewSelectedObjects[IndexToAdd++]);
+		if (!SelectedObjects.Contains(NewSelectedObjects[IndexToAdd]))
+		{
+			AddUnitToSelected(NewSelectedObjects[IndexToAdd]);
+		}
+		++IndexToAdd;
+	}
+	if (PreviousNumSelectedObjects != SelectedObjects.Num()) {
+		SelectedObjects.Sort([](const AUnit& LHS, const AUnit& RHS) { return LHS.GetPriority() > RHS.GetPriority(); });
+		UIWidget->ReorderSelectedUnitWidgets(SelectedObjects);
 	}
 }
 
