@@ -146,4 +146,6 @@ public:
 	void SetTeamId(int32 NewTeamId);
 
 	int32 GetTeamId() const;
+
+	class UPlayerUIWidget* GetUIWidget() const;
 };

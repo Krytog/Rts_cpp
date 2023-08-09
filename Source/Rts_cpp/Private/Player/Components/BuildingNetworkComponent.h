@@ -43,6 +43,7 @@ private:
 	void CalculateConnections(const ABuilding* Building);
 
 	/* It uses event from ISelectable interface, therefore it takes ISelectable* */
+	UFUNCTION()
 	void RemoveDestroyedBuilding(AActor* Object, EEndPlayReason::Type EndPlayReason);
 
 	class FGraphWithPointers Graph;

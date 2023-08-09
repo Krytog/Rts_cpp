@@ -51,6 +51,11 @@ void UPlayerUIWidget::RebuildSelectedUnitWidgets()
 	}
 }
 
+UMinimapWidget* UPlayerUIWidget::GetMinimap() const
+{
+	return Minimap;
+}
+
 void UPlayerUIWidget::AddSelectedUintWidgetToCorrespondingLayer(UWidget* Widget, int32 AlreadyIn)
 {
 	if (AlreadyIn == 36)

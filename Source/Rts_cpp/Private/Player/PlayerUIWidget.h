@@ -16,7 +16,7 @@ class UPlayerUIWidget : public UUserWidget
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
-	class UImage* Minimap;
+	class UMinimapWidget* Minimap;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget))
 	class UImage* OrdersPanel;
@@ -40,6 +40,8 @@ public:
 
 	/* This function will rebuild SelectedUnitsPanel maintaining their relative order */
 	void RebuildSelectedUnitWidgets();
+
+	class UMinimapWidget* GetMinimap() const;
 
 private:
 	void AddSelectedUintWidgetToCorrespondingLayer(class UWidget* Widget, int32 AlreadyIn);

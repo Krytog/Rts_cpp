@@ -21,10 +21,12 @@ class IMinimapVisible
 	GENERATED_BODY()
 
 public:
-	virtual FVector2D GetObjectCoordinates() const = 0;
-	virtual class UWidget* GetMinimapWidget() const = 0;
+	virtual void RegisterAtMinimap(class ADefaultPlayer* Player) const = 0;
 
-	virtual FActorEndPlaySignature& OnEndPlayEvent() const = 0;
+	virtual FVector2D GetObjectCoordinates() const = 0;
+	virtual class UWidgetMinimap* GetWidgetMinimap() const = 0;
+
+	virtual FActorEndPlaySignature& OnEndPlayEvent() = 0;
 
 	friend uint32 GetTypeHash(const IMinimapVisible* Object);
 	bool operator==(const IMinimapVisible* Object) const;

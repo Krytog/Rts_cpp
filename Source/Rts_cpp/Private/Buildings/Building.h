@@ -77,9 +77,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BuildingSettings|BuildingInfoWidget")
 	class UWidgetComponent* InfoWidgetComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Name")
-	FText InfoName;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BasicBuildingSettings|Placement")
 	class UMaterialInterface* MaterialPlacementGood;
 

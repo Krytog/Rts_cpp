@@ -420,6 +420,11 @@ void ADefaultPlayer::SetTeamId(int32 NewTeamId)
 	TeamId = NewTeamId;
 }
 
+UPlayerUIWidget* ADefaultPlayer::GetUIWidget() const
+{
+	return UIWidget;
+}
+
 int32 ADefaultPlayer::GetTeamId() const
 {
 	return TeamId;
