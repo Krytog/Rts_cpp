@@ -21,11 +21,16 @@ class IMinimapVisible
 	GENERATED_BODY()
 
 public:
-	virtual void RegisterAtMinimap(class ADefaultPlayer* Player) const = 0;
+	/* Register this object on the minimap of given player */
+	virtual void RegisterOnMinimap(class ADefaultPlayer* Player) const = 0;
 
+	/* Returns 2D coordinates of the object that are used for displaying object on the minimap*/
 	virtual FVector2D GetObjectCoordinates() const = 0;
+
+	/* Returns Widget that is displayed on the minimap*/
 	virtual class UWidgetMinimap* GetWidgetMinimap() const = 0;
 
+	/* Returns delegate that is fired when this object ends play */
 	virtual FActorEndPlaySignature& OnEndPlayEvent() = 0;
 
 	friend uint32 GetTypeHash(const IMinimapVisible* Object);

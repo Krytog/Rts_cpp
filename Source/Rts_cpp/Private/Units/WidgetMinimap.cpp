@@ -16,5 +16,5 @@ void UWidgetMinimap::SetColor(FLinearColor Color)
 
 void UWidgetMinimap::SetSize(FVector2D NewSize)
 {
-	Image->SetBrushSize(NewSize);
+	Image->SetDesiredSizeOverride(NewSize);
 }

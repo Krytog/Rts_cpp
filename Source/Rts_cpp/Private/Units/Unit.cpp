@@ -71,7 +71,7 @@ UWidgetSelected* AUnit::GetWidgetSelected() const
 	return WidgetSelected;
 }
 
-void AUnit::RegisterAtMinimap(ADefaultPlayer* Player) const
+void AUnit::RegisterOnMinimap(ADefaultPlayer* Player) const
 {
 	UPlayerUIWidget* UIWidget = Player->GetUIWidget();
 	UMinimapWidget* Minimap = UIWidget->GetMinimap();
@@ -81,7 +81,7 @@ void AUnit::RegisterAtMinimap(ADefaultPlayer* Player) const
 FVector2D AUnit::GetObjectCoordinates() const
 {
 	FVector ObjectLocation = GetActorLocation();
-	return {ObjectLocation.X, ObjectLocation.Y};
+	return {ObjectLocation.Y, ObjectLocation.X}; // It's not a mistake
 }
 
 UWidgetMinimap* AUnit::GetWidgetMinimap() const
