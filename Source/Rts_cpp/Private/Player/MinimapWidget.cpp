@@ -12,12 +12,13 @@ UCanvasPanelSlot* UMinimapWidget::CoreAddObject(const IMinimapVisible* Object)
 {
 	UPanelSlot* PanelSlot = Minimap->AddChild(Object->GetWidgetMinimap());
 	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PanelSlot);
-	CanvasSlot->SetAutoSize(true);
+	CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
 	return CanvasSlot;
 }
 
 void UMinimapWidget::PlaceOnMinimap(const class IMinimapVisible* Object, class UCanvasPanelSlot* CanvasSlot) const
 {
+	// Setting actual position
 	const FVector2D WorldCoordinates = Object->GetObjectCoordinates();
 	const float RelativeX = 0.5f + WorldCoordinates.X / MapWidth;
 	const float RelativeY = 0.5f - WorldCoordinates.Y / MapHeight;
@@ -25,6 +26,11 @@ void UMinimapWidget::PlaceOnMinimap(const class IMinimapVisible* Object, class U
 	Anchors.Minimum = FVector2D(RelativeX, RelativeY);
 	Anchors.Maximum = Anchors.Minimum;
 	CanvasSlot->SetAnchors(Anchors);
+
+	// Setting actual size
+	const UWidgetMinimap* Widget = Object->GetWidgetMinimap();
+	const FVector2D DesiredSize = Widget->GetSize();
+	CanvasSlot->SetSize(DesiredSize);
 }
 
 void UMinimapWidget::AddStaticObject(const IMinimapVisible* Object)

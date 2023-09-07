@@ -14,7 +14,12 @@ void UWidgetMinimap::SetColor(FLinearColor Color)
 	Image->SetColorAndOpacity(Color);
 }
 
-void UWidgetMinimap::SetSize(FVector2D NewSize)
+void UWidgetMinimap::UpdateSize(FVector2D NewSize)
 {
-	Image->SetDesiredSizeOverride(NewSize);
+	Size = NewSize;
+}
+
+FVector2D UWidgetMinimap::GetSize() const
+{
+	return Size;
 }

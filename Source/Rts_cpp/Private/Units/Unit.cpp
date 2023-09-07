@@ -112,7 +112,7 @@ void AUnit::InitWidgetMinimap()
 		check(WidgetMinimap);
 		WidgetMinimap->SetImage(IconMinimap);
 		WidgetMinimap->SetColor(FLinearColor::Green);
-		WidgetMinimap->SetSize(IconMinimapSize);
+		WidgetMinimap->UpdateSize(IconMinimapSize);
 	}
 }
 
