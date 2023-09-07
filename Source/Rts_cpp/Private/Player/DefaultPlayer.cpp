@@ -14,6 +14,7 @@
 #include "Player/Components/BuildingPlacerComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Player/PlayerUIWidget.h"
+#include "Player/MinimapWidget.h"
 #include "Units/WidgetSelected.h"
 #include "Units/Unit.h"
 
@@ -55,6 +56,9 @@ void ADefaultPlayer::BeginPlay()
 void ADefaultPlayer::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	GetWorldTimerManager().ClearTimer(MinimapUpdateTimer);
+
 	UIWidget->RemoveFromParent();
 	UIWidget = nullptr; // So it will eventually be destroyed by GC
 }
@@ -412,6 +416,9 @@ void ADefaultPlayer::InitUIWidget()
 	{
 		UIWidget = CreateWidget<UPlayerUIWidget>(Cast<APlayerController>(GetController()), UIWidgetClass);
 		UIWidget->AddToViewport();
+
+		GetWorldTimerManager().SetTimer(MinimapUpdateTimer, UIWidget->GetMinimap(),
+										&UMinimapWidget::UpdateObjectsLocation, MinimapUpdateInterval, true, 0.0f);
 	}
 }
 

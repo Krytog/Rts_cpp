@@ -22,7 +22,7 @@ class IMinimapVisible
 
 public:
 	/* Register this object on the minimap of given player */
-	virtual void RegisterOnMinimap(class ADefaultPlayer* Player) const = 0;
+	virtual void RegisterOnMinimap(class ADefaultPlayer* Player) = 0;
 
 	/* Returns 2D coordinates of the object that are used for displaying object on the minimap*/
 	virtual FVector2D GetObjectCoordinates() const = 0;

@@ -35,7 +35,7 @@ public:
 
 	// IMinimapVisible overrides
 	UFUNCTION(BlueprintCallable)
-	virtual void RegisterOnMinimap(class ADefaultPlayer* Player) const override;
+	virtual void RegisterOnMinimap(class ADefaultPlayer* Player) override;
 	virtual FVector2D GetObjectCoordinates() const override;
 	virtual class UWidgetMinimap* GetWidgetMinimap() const override;
 

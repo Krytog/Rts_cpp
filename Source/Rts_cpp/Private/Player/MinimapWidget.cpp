@@ -33,15 +33,25 @@ void UMinimapWidget::PlaceOnMinimap(const class IMinimapVisible* Object, class U
 	CanvasSlot->SetSize(DesiredSize);
 }
 
-void UMinimapWidget::AddStaticObject(const IMinimapVisible* Object)
+void UMinimapWidget::RemoveDestroyedObject(AActor* Actor, EEndPlayReason::Type EndPlayReason)
+{
+	IMinimapVisible* MinimapVisible = Cast<IMinimapVisible>(Actor);
+	MinimapVisible->OnEndPlayEvent().RemoveDynamic(this, &UMinimapWidget::RemoveDestroyedObject);
+	RemoveFromMinimap(MinimapVisible);
+	DynamicObjects.Remove(MinimapVisible);
+}
+
+void UMinimapWidget::AddStaticObject(IMinimapVisible* Object)
 {
 	UCanvasPanelSlot* CanvasSlot = CoreAddObject(Object);
+	Object->OnEndPlayEvent().AddDynamic(this, &UMinimapWidget::RemoveDestroyedObject);
 	PlaceOnMinimap(Object, CanvasSlot);
 }
 
-void UMinimapWidget::AddDynamicObject(const IMinimapVisible* Object)
+void UMinimapWidget::AddDynamicObject(IMinimapVisible* Object)
 {
 	UCanvasPanelSlot* CanvasSlot = CoreAddObject(Object);
+	Object->OnEndPlayEvent().AddDynamic(this, &UMinimapWidget::RemoveDestroyedObject);
 	PlaceOnMinimap(Object, CanvasSlot);
 	DynamicObjects.Add(Object, CanvasSlot);
 }

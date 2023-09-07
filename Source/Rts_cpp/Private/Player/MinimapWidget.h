@@ -17,15 +17,15 @@ class UMinimapWidget : public UUserWidget
 
 public:
 	/* Adds an object whose location won't be updated */
-	void AddStaticObject(const class IMinimapVisible* Object);
+	void AddStaticObject(class IMinimapVisible* Object);
 
 	/* Adds an object whose location will be updated when UpdateObjectsLocation is called */
-	void AddDynamicObject(const class IMinimapVisible* Object);
+	void AddDynamicObject(class IMinimapVisible* Object);
 
 	/* Removes an object from this minimap */
 	void RemoveFromMinimap(const class IMinimapVisible* Object);
 
-	/* Updates all rigstered dynamic object locations. Has O(dynamic objects count) perfomance */
+	/* Updates all registered dynamic object locations. Has O(dynamic objects count) perfomance */
 	void UpdateObjectsLocation();
 
 	/* Sets Map Size that will be used to calculate realtive positions on the minimap */
@@ -46,6 +46,10 @@ private:
 
 	/* Places an object icon on the minimap based on the posisiton in the game world. This object should be already added to the canvas */
 	void PlaceOnMinimap(const class IMinimapVisible* Object, class UCanvasPanelSlot* CanvasSlot) const;
+
+	/* Removes an object from the minimap. Should be binded to the object's EndPlayEvent */
+	UFUNCTION()
+	void RemoveDestroyedObject(AActor* Actor, EEndPlayReason::Type EndPlayReason);
 
 	float MapWidth = 4000.0f;
 	float MapHeight = 4000.0f;

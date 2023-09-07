@@ -71,7 +71,7 @@ UWidgetSelected* AUnit::GetWidgetSelected() const
 	return WidgetSelected;
 }
 
-void AUnit::RegisterOnMinimap(ADefaultPlayer* Player) const
+void AUnit::RegisterOnMinimap(ADefaultPlayer* Player)
 {
 	UPlayerUIWidget* UIWidget = Player->GetUIWidget();
 	UMinimapWidget* Minimap = UIWidget->GetMinimap();
